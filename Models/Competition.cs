@@ -20,4 +20,4 @@ namespace QuizCompetitionManager.Models
         public ICollection<CompetitionRegistration> Registrations { get; set; } = new List<CompetitionRegistration>();
     }
 }
-}
+
