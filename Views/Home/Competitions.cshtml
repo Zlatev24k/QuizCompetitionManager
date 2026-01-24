@@ -1,0 +1,133 @@
+﻿@model IEnumerable<QuizCompetitionManager.Models.Competition>
+@using QuizCompetitionManager.Models
+
+@{
+    ViewData["Title"] = "Състезания";
+    var planned = Model.Where(c => c.Status == CompetitionStatus.Planned).ToList();
+    var active = Model.Where(c => c.Status == CompetitionStatus.Active).ToList();
+    var finished = Model.Where(c => c.Status == CompetitionStatus.Finished).ToList();
+}
+
+<h2 class="mb-3">Състезания</h2>
+
+<div class="row g-3">
+    <!-- Planned -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span class="fw-semibold">Предстоящи</span>
+                <span class="badge bg-secondary">@planned.Count</span>
+            </div>
+            <div class="card-body">
+                @if (!planned.Any())
+                {
+                    <div class="text-muted">Няма предстоящи състезания.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Име</th>
+                                    <th>Дата/час</th>
+                                    <th>Кръгове</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var c in planned)
+                                {
+                                    <tr>
+                                        <td>@c.Name</td>
+                                        <td>@c.StartDateTime.ToString("dd.MM.yyyy HH:mm")</td>
+                                        <td>@c.RoundsCount</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Active -->
+    <div class="col-12">
+        <div class="card border-success">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span class="fw-semibold text-success">Активни</span>
+                <span class="badge bg-success">@active.Count</span>
+            </div>
+            <div class="card-body">
+                @if (!active.Any())
+                {
+                    <div class="text-muted">Няма активни състезания.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Име</th>
+                                    <th>Дата/час</th>
+                                    <th>Кръгове</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var c in active)
+                                {
+                                    <tr>
+                                        <td>@c.Name</td>
+                                        <td>@c.StartDateTime.ToString("dd.MM.yyyy HH:mm")</td>
+                                        <td>@c.RoundsCount</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Finished -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span class="fw-semibold">Приключили (Архив)</span>
+                <span class="badge bg-dark">@finished.Count</span>
+            </div>
+            <div class="card-body">
+                @if (!finished.Any())
+                {
+                    <div class="text-muted">Няма приключили състезания.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Име</th>
+                                    <th>Дата/час</th>
+                                    <th>Кръгове</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var c in finished)
+                                {
+                                    <tr>
+                                        <td>@c.Name</td>
+                                        <td>@c.StartDateTime.ToString("dd.MM.yyyy HH:mm")</td>
+                                        <td>@c.RoundsCount</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

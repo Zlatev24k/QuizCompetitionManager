@@ -25,10 +25,13 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Competitions">Състезания</a>
+                        </li>
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Competitions" asp-action="Index">Състезания</a>
+                                <a class="nav-link text-dark" asp-controller="Competitions" asp-action="Index">Управление на състезания</a>
                             </li>
                         }
                     </ul>
