@@ -1,0 +1,48 @@
+﻿@model IEnumerable<QuizCompetitionManager.Models.Competition>
+@using QuizCompetitionManager.Models
+
+@{
+    ViewData["Title"] = "Състезания";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Състезания</h2>
+    <a class="btn btn-primary" asp-action="Create">+ Ново състезание</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Няма създадени състезания.</div>
+}
+else
+{
+    <table class="table table-striped table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Име</th>
+                <th>Дата/час</th>
+                <th>Кръгове</th>
+                <th>Статус</th>
+                <th class="text-end">Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in Model)
+            {
+                <tr>
+                    <td>@c.Name</td>
+                    <td>@c.StartDateTime.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@c.RoundsCount</td>
+                    <td>
+                        <span class="badge bg-secondary">@c.Status</span>
+                    </td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@c.Id">Детайли</a>
+                        <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@c.Id">Редакция</a>
+                        <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@c.Id">Изтрий</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

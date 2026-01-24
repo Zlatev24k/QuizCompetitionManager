@@ -1,0 +1,30 @@
+﻿@model QuizCompetitionManager.Models.Competition
+
+@{
+    ViewData["Title"] = "Детайли";
+}
+
+<h2 class="mb-3">Детайли</h2>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Име</dt>
+            <dd class="col-sm-9">@Model.Name</dd>
+
+            <dt class="col-sm-3">Дата/час</dt>
+            <dd class="col-sm-9">@Model.StartDateTime.ToString("dd.MM.yyyy HH:mm")</dd>
+
+            <dt class="col-sm-3">Брой кръгове</dt>
+            <dd class="col-sm-9">@Model.RoundsCount</dd>
+
+            <dt class="col-sm-3">Статус</dt>
+            <dd class="col-sm-9">@Model.Status</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="mt-3 d-flex gap-2">
+    <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@Model.Id">Редакция</a>
+    <a class="btn btn-outline-secondary" asp-action="Index">Назад</a>
+</div>

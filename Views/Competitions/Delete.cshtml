@@ -1,0 +1,37 @@
+﻿@model QuizCompetitionManager.Models.Competition
+
+@{
+    ViewData["Title"] = "Изтриване";
+}
+
+<h2 class="mb-3 text-danger">Изтриване на състезание</h2>
+
+<div class="alert alert-warning">
+    Сигурен ли си, че искаш да изтриеш това състезание?
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Име</dt>
+            <dd class="col-sm-9">@Model.Name</dd>
+
+            <dt class="col-sm-3">Дата/час</dt>
+            <dd class="col-sm-9">@Model.StartDateTime.ToString("dd.MM.yyyy HH:mm")</dd>
+
+            <dt class="col-sm-3">Кръгове</dt>
+            <dd class="col-sm-9">@Model.RoundsCount</dd>
+
+            <dt class="col-sm-3">Статус</dt>
+            <dd class="col-sm-9">@Model.Status</dd>
+        </dl>
+    </div>
+</div>
+
+<form asp-action="Delete" method="post" class="mt-3">
+    <input type="hidden" asp-for="Id" />
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-danger">Да, изтрий</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Отказ</a>
+    </div>
+</form>
