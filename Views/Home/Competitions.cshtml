@@ -32,6 +32,7 @@
                                     <th>Име</th>
                                     <th>Дата/час</th>
                                     <th>Кръгове</th>
+                                    <th class="text-end">Действия</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -41,6 +42,20 @@
                                         <td>@c.Name</td>
                                         <td>@c.StartDateTime.ToString("dd.MM.yyyy HH:mm")</td>
                                         <td>@c.RoundsCount</td>
+                                        <td class="text-end">
+                                            <a class="btn btn-sm btn-outline-secondary"
+                                               asp-controller="Home"
+                                               asp-action="CompetitionDetails"
+                                               asp-route-id="@c.Id">Детайли</a>
+
+                                            @if (User.Identity?.IsAuthenticated == true && !User.IsInRole("Admin"))
+                                            {
+                                                <a class="btn btn-sm btn-primary ms-1"
+                                                   asp-controller="Registrations"
+                                                   asp-action="Join"
+                                                   asp-route-competitionId="@c.Id">Запиши се</a>
+                                            }
+                                        </td>
                                     </tr>
                                 }
                             </tbody>
@@ -72,6 +87,7 @@
                                     <th>Име</th>
                                     <th>Дата/час</th>
                                     <th>Кръгове</th>
+                                    <th class="text-end">Действия</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -81,6 +97,20 @@
                                         <td>@c.Name</td>
                                         <td>@c.StartDateTime.ToString("dd.MM.yyyy HH:mm")</td>
                                         <td>@c.RoundsCount</td>
+                                        <td class="text-end">
+                                            <a class="btn btn-sm btn-outline-secondary"
+                                               asp-controller="Home"
+                                               asp-action="CompetitionDetails"
+                                               asp-route-id="@c.Id">Детайли</a>
+
+                                            @if (User.Identity?.IsAuthenticated == true && !User.IsInRole("Admin"))
+                                            {
+                                                <a class="btn btn-sm btn-primary ms-1"
+                                                   asp-controller="Registrations"
+                                                   asp-action="Join"
+                                                   asp-route-competitionId="@c.Id">Запиши се</a>
+                                            }
+                                        </td>
                                     </tr>
                                 }
                             </tbody>
@@ -112,6 +142,7 @@
                                     <th>Име</th>
                                     <th>Дата/час</th>
                                     <th>Кръгове</th>
+                                    <th class="text-end">Действия</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -121,6 +152,20 @@
                                         <td>@c.Name</td>
                                         <td>@c.StartDateTime.ToString("dd.MM.yyyy HH:mm")</td>
                                         <td>@c.RoundsCount</td>
+                                        <td class="text-end">
+                                            <a class="btn btn-sm btn-outline-secondary"
+                                               asp-controller="Home"
+                                               asp-action="CompetitionDetails"
+                                               asp-route-id="@c.Id">Детайли</a>
+
+                                            @if (User.Identity?.IsAuthenticated == true && !User.IsInRole("Admin"))
+                                            {
+                                                <a class="btn btn-sm btn-primary ms-1"
+                                                   asp-controller="Registrations"
+                                                   asp-action="Join"
+                                                   asp-route-competitionId="@c.Id">Запиши се</a>
+                                            }
+                                        </td>
                                     </tr>
                                 }
                             </tbody>

@@ -35,6 +35,17 @@ namespace QuizCompetitionManager.Controllers
 
             return View(comps);
         }
+        public IActionResult Rules()
+        {
+            return View();
+        }
+        public async Task<IActionResult> CompetitionDetails(int id)
+        {
+            var comp = await _db.Competitions.FirstOrDefaultAsync(c => c.Id == id);
+            if (comp == null) return NotFound();
+
+            return View(comp);
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
