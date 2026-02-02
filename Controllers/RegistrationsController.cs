@@ -63,5 +63,45 @@ namespace QuizCompetitionManager.Controllers
             TempData["Success"] = "Успешно записване за състезанието!";
             return RedirectToAction("Competitions", "Home");
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Unjoin(int competitionId)
+        {
+            if (User.IsInRole(SeedData.AdminRole))
+                return Forbid();
+
+            var comp = await _db.Competitions.FirstOrDefaultAsync(c => c.Id == competitionId);
+            if (comp == null) return NotFound();
+
+            if (comp.Status != CompetitionStatus.Planned)
+            {
+                TempData["Error"] = "Отписване е възможно само за планирани състезания.";
+                return RedirectToAction("Competitions", "Home");
+            }
+
+            var userId = _userManager.GetUserId(User)!;
+
+            var team = await _db.Teams.FirstOrDefaultAsync(t => t.OwnerUserId == userId);
+            if (team == null)
+            {
+                TempData["Error"] = "Нямаш отбор.";
+                return RedirectToAction("Create", "Team");
+            }
+
+            var reg = await _db.CompetitionRegistrations
+                .FirstOrDefaultAsync(r => r.CompetitionId == competitionId && r.TeamId == team.Id);
+
+            if (reg == null)
+            {
+                TempData["Error"] = "Отборът не е записан за това състезание.";
+                return RedirectToAction("Competitions", "Home");
+            }
+
+            _db.CompetitionRegistrations.Remove(reg);
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = "Успешно отписване от състезанието.";
+            return RedirectToAction("Competitions", "Home");
+        }
     }
 }

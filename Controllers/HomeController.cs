@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuizCompetitionManager.Data;
 using QuizCompetitionManager.Models;
+using QuizCompetitionManager.Models.ViewModels;
 using System.Diagnostics;
 
 namespace QuizCompetitionManager.Controllers
@@ -10,11 +12,13 @@ namespace QuizCompetitionManager.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _db;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext db)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext db, UserManager<IdentityUser> userManager)
         {
             _logger = logger;
             _db = db;
+            _userManager = userManager;
         }
 
         public IActionResult Index()
@@ -30,11 +34,34 @@ namespace QuizCompetitionManager.Controllers
         {
             var comps = await _db.Competitions
                 .OrderBy(c => c.Status)
-                .OrderByDescending(c => c.StartDateTime)
+                .ThenByDescending(c => c.StartDateTime)
                 .ToListAsync();
 
-            return View(comps);
+            var vm = new PublicCompetitionsVM
+            {
+                Competitions = comps,
+                CanJoinOrUnjoin = User.Identity?.IsAuthenticated == true && !User.IsInRole(SeedData.AdminRole)
+            };
+
+            if (vm.CanJoinOrUnjoin)
+            {
+                var userId = _userManager.GetUserId(User)!;
+
+                var team = await _db.Teams.FirstOrDefaultAsync(t => t.OwnerUserId == userId);
+                if (team != null)
+                {
+                    var joined = await _db.CompetitionRegistrations
+                        .Where(r => r.TeamId == team.Id)
+                        .Select(r => r.CompetitionId)
+                        .ToListAsync();
+
+                    vm.JoinedCompetitionIds = joined.ToHashSet();
+                }
+            }
+
+            return View(vm);
         }
+
         public IActionResult Rules()
         {
             return View();

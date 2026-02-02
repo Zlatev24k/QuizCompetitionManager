@@ -1,11 +1,12 @@
-﻿@model IEnumerable<QuizCompetitionManager.Models.Competition>
+﻿@model QuizCompetitionManager.Models.ViewModels.PublicCompetitionsVM
 @using QuizCompetitionManager.Models
+@using QuizCompetitionManager.Models.ViewModels
 
 @{
     ViewData["Title"] = "Състезания";
-    var planned = Model.Where(c => c.Status == CompetitionStatus.Planned).ToList();
-    var active = Model.Where(c => c.Status == CompetitionStatus.Active).ToList();
-    var finished = Model.Where(c => c.Status == CompetitionStatus.Finished).ToList();
+    var planned = Model.Competitions.Where(c => c.Status == CompetitionStatus.Planned).ToList();
+    var active = Model.Competitions.Where(c => c.Status == CompetitionStatus.Active).ToList();
+    var finished = Model.Competitions.Where(c => c.Status == CompetitionStatus.Finished).ToList();
 }
 
 <h2 class="mb-3">Състезания</h2>
@@ -57,12 +58,25 @@
                                                asp-action="CompetitionDetails"
                                                asp-route-id="@c.Id">Детайли</a>
 
-                                            @if (User.Identity?.IsAuthenticated == true && !User.IsInRole("Admin"))
+                                            @if (Model.CanJoinOrUnjoin)
                                             {
-                                                <a class="btn btn-sm btn-primary ms-1"
-                                                   asp-controller="Registrations"
-                                                   asp-action="Join"
-                                                   asp-route-competitionId="@c.Id">Запиши се</a>
+                                                var isJoined = Model.JoinedCompetitionIds.Contains(c.Id);
+
+                                                if (!isJoined)
+                                                {
+                                                    <a class="btn btn-sm btn-primary ms-1"
+                                                       asp-controller="Registrations"
+                                                       asp-action="Join"
+                                                       asp-route-competitionId="@c.Id">Запиши се</a>
+                                                }
+                                                else
+                                                {
+                                                    <form asp-controller="Registrations" asp-action="Unjoin" method="post" class="d-inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="competitionId" value="@c.Id" />
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger ms-1">Отпиши се</button>
+                                                    </form>
+                                                }
                                             }
                                         </td>
                                     </tr>
