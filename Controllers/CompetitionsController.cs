@@ -89,5 +89,37 @@ namespace QuizCompetitionManager.Controllers
             await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        //START
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Start(int id)
+        {
+            var comp = await _db.Competitions.FindAsync(id);
+            if (comp == null) return NotFound();
+
+            if (comp.Status != CompetitionStatus.Planned)
+            {
+                TempData["Error"] = "Само планирано състезание може да бъде стартирано.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var hasTeams = await _db.CompetitionRegistrations
+                .AnyAsync(r => r.CompetitionId == id);
+
+            if (!hasTeams)
+            {
+                TempData["Error"] = "Не може да стартираш състезание без записани отбори.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            comp.Status = CompetitionStatus.Active;
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = "Състезанието е стартирано успешно.";
+            return RedirectToAction(nameof(Index));
+        }
+
+
     }
 }

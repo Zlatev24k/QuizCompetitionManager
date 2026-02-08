@@ -5,6 +5,15 @@
     ViewData["Title"] = "Състезания";
 }
 
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">Състезания</h2>
     <a class="btn btn-primary" asp-action="Create">+ Ново състезание</a>
@@ -40,6 +49,16 @@ else
                         <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@c.Id">Детайли</a>
                         <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@c.Id">Редакция</a>
                         <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@c.Id">Изтрий</a>
+                        @if (c.Status == CompetitionStatus.Planned)
+                        {
+                            <form asp-action="Start" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@c.Id" />
+                                <button type="submit" class="btn btn-sm btn-success">
+                                    Стартирай
+                                </button>
+                            </form>
+                        }
                     </td>
                 </tr>
             }
