@@ -1,0 +1,120 @@
+﻿@model QuizCompetitionManager.Models.ViewModels.CompetitionManageVM
+@using QuizCompetitionManager.Models
+
+@{
+    ViewData["Title"] = "Управление на точки";
+    var isEditable = Model.Status == CompetitionStatus.Active;
+}
+
+<h2 class="mb-2">Управление на точки</h2>
+
+<div class="text-muted mb-3">
+    <strong>@Model.CompetitionName</strong> • @Model.StartDateTime.ToString("dd.MM.yyyy HH:mm")
+    • Кръгове: @Model.RoundsCount • Статус: @Model.Status
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (!Model.Teams.Any())
+{
+    <div class="alert alert-info">Няма записани отбори за това състезание.</div>
+    <a class="btn btn-outline-secondary" asp-action="Index">Назад</a>
+}
+else
+{
+    <div class="d-flex gap-2 mb-3 align-items-center">
+        <span class="text-muted">
+            @if (isEditable)
+            {
+                <text>Можеш да въвеждаш и запазваш точки.</text>
+            }
+            else
+            {
+                <text>Редакцията е заключена (не е активно).</text>
+            }
+        </span>
+
+        <a class="btn btn-outline-secondary ms-auto" asp-action="Index">Към списъка</a>
+
+        @if (Model.Status == CompetitionStatus.Active)
+        {
+            <form asp-action="Finish" method="post" class="mb-0">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.CompetitionId" />
+                <button class="btn btn-danger" type="submit">Приключи</button>
+            </form>
+        }
+    </div>
+
+    <form asp-action="SaveAll" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="CompetitionId" />
+
+        <div class="d-flex gap-2 mb-3">
+            <button class="btn btn-primary" type="submit" disabled="@(!isEditable)">
+                Запази всички
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Отбор</th>
+                        @for (int r = 1; r <= Model.RoundsCount; r++)
+                        {
+                            <th class="text-center">Кръг @r</th>
+                        }
+                        <th class="text-center">Общо</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @for (int i = 0; i < Model.Teams.Count; i++)
+                    {
+                        var row = Model.Teams[i];
+                        var total = row.RoundPoints.Sum(x => x.Points);
+
+                        <tr>
+                            <td>
+                                <strong>@row.TeamName</strong>
+                                <input type="hidden" asp-for="Teams[@i].RegistrationId" />
+                                <input type="hidden" asp-for="Teams[@i].TeamName" />
+                            </td>
+
+                            @for (int j = 0; j < row.RoundPoints.Count; j++)
+                            {
+                                <td class="text-center" style="max-width:120px;">
+                                    <input type="hidden" asp-for="Teams[@i].RoundPoints[@j].RoundNumber" />
+                                    <input asp-for="Teams[@i].RoundPoints[@j].Points"
+                                           class="form-control text-center"
+                                           type="number"
+                                           min="0"
+                                           disabled="@(!isEditable)" />
+                                </td>
+                            }
+
+                            <td class="text-center">
+                                <span class="badge bg-dark">@total</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!isEditable)
+        {
+            <div class="alert alert-secondary mt-3 mb-0">
+                Редакцията е заключена, защото състезанието не е активно.
+            </div>
+        }
+    </form>
+}
