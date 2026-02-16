@@ -66,12 +66,38 @@ namespace QuizCompetitionManager.Controllers
         {
             return View();
         }
+
         public async Task<IActionResult> CompetitionDetails(int id)
         {
-            var comp = await _db.Competitions.FirstOrDefaultAsync(c => c.Id == id);
+            var comp = await _db.Competitions
+        .FirstOrDefaultAsync(c => c.Id == id);
+
             if (comp == null) return NotFound();
 
-            return View(comp);
+            var vm = new CompetitionDetailsVM
+            {
+                Competition = comp
+            };
+
+            if (comp.Status != CompetitionStatus.Planned)
+            {
+                var regs = await _db.CompetitionRegistrations
+                    .Where(r => r.CompetitionId == id)
+                    .Include(r => r.Team)
+                    .Include(r => r.RoundScores)
+                    .ToListAsync();
+
+                vm.Ranking = regs
+                    .Select(r => new RankingRowVM
+                    {
+                        TeamName = r.Team!.Name,
+                        TotalPoints = r.RoundScores.Sum(s => s.Points)
+                    })
+                    .OrderByDescending(r => r.TotalPoints)
+                    .ToList();
+            }
+
+            return View(vm);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

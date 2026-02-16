@@ -1,4 +1,5 @@
-﻿@model QuizCompetitionManager.Models.Competition
+﻿@model QuizCompetitionManager.Models.ViewModels.CompetitionDetailsVM
+@using QuizCompetitionManager.Models
 
 @{
     ViewData["Title"] = "Детайли за състезание";
@@ -6,24 +7,67 @@
 
 <h2 class="mb-3">Детайли за състезание</h2>
 
-<div class="card">
+<div class="card mb-4">
     <div class="card-body">
         <dl class="row mb-0">
             <dt class="col-sm-3">Име</dt>
-            <dd class="col-sm-9">@Model.Name</dd>
+            <dd class="col-sm-9">@Model.Competition.Name</dd>
 
             <dt class="col-sm-3">Дата/час</dt>
-            <dd class="col-sm-9">@Model.StartDateTime.ToString("dd.MM.yyyy HH:mm")</dd>
+            <dd class="col-sm-9">@Model.Competition.StartDateTime.ToString("dd.MM.yyyy HH:mm")</dd>
 
             <dt class="col-sm-3">Брой кръгове</dt>
-            <dd class="col-sm-9">@Model.RoundsCount</dd>
+            <dd class="col-sm-9">@Model.Competition.RoundsCount</dd>
 
             <dt class="col-sm-3">Статус</dt>
-            <dd class="col-sm-9">@Model.Status</dd>
+            <dd class="col-sm-9">@Model.Competition.Status</dd>
         </dl>
     </div>
 </div>
 
-<div class="mt-3 d-flex gap-2">
+<h4 class="mb-3">Класиране</h4>
+
+@if (Model.Competition.Status == CompetitionStatus.Planned)
+{
+    <div class="alert alert-info">
+        Все още няма резултати за това състезание.
+    </div>
+}
+else if (!Model.Ranking.Any())
+{
+    <div class="alert alert-warning">
+        Няма въведени резултати.
+    </div>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Отбор</th>
+                <th class="text-end">Общо точки</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int position = 1;
+            }
+            @foreach (var row in Model.Ranking)
+            {
+                <tr>
+                    <td>@position</td>
+                    <td>@row.TeamName</td>
+                    <td class="text-end">
+                        <span class="badge bg-dark">@row.TotalPoints</span>
+                    </td>
+                </tr>
+                position++;
+            }
+        </tbody>
+    </table>
+}
+
+<div class="mt-3">
     <a class="btn btn-outline-secondary" asp-action="Competitions">Назад</a>
 </div>
