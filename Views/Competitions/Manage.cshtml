@@ -53,9 +53,9 @@ else
         }
     </div>
 
-    <form asp-action="SaveAll" method="post">
+    <form asp-controller="Competitions" asp-action="SaveAll" method="post">
         @Html.AntiForgeryToken()
-        <input type="hidden" asp-for="CompetitionId" />
+        <input type="hidden" name="competitionId" value="@Model.CompetitionId" />
 
         <div class="d-flex gap-2 mb-3">
             <button class="btn btn-primary" type="submit" disabled="@(!isEditable)">
@@ -84,9 +84,40 @@ else
 
                         <tr>
                             <td>
-                                <strong>@row.TeamName</strong>
-                                <input type="hidden" asp-for="Teams[@i].RegistrationId" />
-                                <input type="hidden" asp-for="Teams[@i].TeamName" />
+                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                    <div>
+                                        <strong>@row.TeamName</strong>
+
+                                        @if (row.Members != null && row.Members.Any())
+                                        {
+                                            <div class="small text-muted mt-1">
+                                                @string.Join(", ", row.Members)
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="small text-muted mt-1">
+                                                Няма добавени членове.
+                                            </div>
+                                        }
+
+                                        <input type="hidden" asp-for="Teams[@i].RegistrationId" />
+                                        <input type="hidden" asp-for="Teams[@i].TeamName" />
+                                    </div>
+
+                                    @if (Model.Status != CompetitionStatus.Finished)
+                                    {
+                                        <button type="submit"
+                                                formaction="@Url.Action("RemoveTeam", "Competitions")"
+                                                formmethod="post"
+                                                name="registrationId"
+                                                value="@row.RegistrationId"
+                                                class="btn btn-sm btn-outline-danger"
+                                                onclick="return confirm('Сигурен ли си?');">
+                                            Премахни
+                                        </button>
+                                    }
+                                </div>
                             </td>
 
                             @for (int j = 0; j < row.RoundPoints.Count; j++)

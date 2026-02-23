@@ -133,6 +133,7 @@ namespace QuizCompetitionManager.Controllers
             var regs = await _db.CompetitionRegistrations
                 .Where(r => r.CompetitionId == id)
                 .Include(r => r.Team)
+                    .ThenInclude(t => t.Members)
                 .Include(r => r.RoundScores)
                 .AsNoTracking()
                 .ToListAsync();
@@ -150,6 +151,10 @@ namespace QuizCompetitionManager.Controllers
                     {
                         RegistrationId = r.Id,
                         TeamName = r.Team!.Name,
+                        Members = r.Team!.Members
+                            .OrderBy(m => m.FullName)
+                            .Select(m => m.FullName)
+                            .ToList(),
                         RoundPoints = Enumerable.Range(1, comp.RoundsCount)
                             .Select(round =>
                             {
@@ -245,6 +250,32 @@ namespace QuizCompetitionManager.Controllers
 
             TempData["Success"] = "Състезанието е приключено и е преместено в Архив.";
             return RedirectToAction(nameof(Manage), new { id });
+        }
+
+        //REMOVE TEAM
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveTeam(int competitionId, int registrationId)
+        {
+            var comp = await _db.Competitions.FindAsync(competitionId);
+            if (comp == null) return NotFound();
+
+            if (comp.Status == CompetitionStatus.Finished)
+            {
+                TempData["Error"] = "Не може да премахваш отбори от приключило състезание.";
+                return RedirectToAction(nameof(Manage), new { id = competitionId });
+            }
+
+            var reg = await _db.CompetitionRegistrations
+                .FirstOrDefaultAsync(r => r.Id == registrationId && r.CompetitionId == competitionId);
+
+            if (reg == null) return NotFound();
+
+            _db.CompetitionRegistrations.Remove(reg);
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = "Отборът беше премахнат от състезанието.";
+            return RedirectToAction(nameof(Manage), new { id = competitionId });
         }
     }
 }

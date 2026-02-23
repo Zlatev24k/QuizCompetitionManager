@@ -17,6 +17,7 @@ namespace QuizCompetitionManager.Models.ViewModels
     {
         public int RegistrationId { get; set; }
         public string TeamName { get; set; } = string.Empty;
+        public List<string> Members { get; set; } = new();
 
         public List<RoundPointVM> RoundPoints { get; set; } = new();
     }
