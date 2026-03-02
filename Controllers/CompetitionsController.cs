@@ -205,7 +205,13 @@ namespace QuizCompetitionManager.Controllers
                     if (rp.RoundNumber < 1 || rp.RoundNumber > comp.RoundsCount)
                         continue;
 
-                    var points = rp.Points < 0 ? 0 : rp.Points;
+                    var points = rp.Points;
+
+                    if (points < 0)
+                        points = 0;
+
+                    if (points > 20)
+                        points = 20;
 
                     var key = (team.RegistrationId, rp.RoundNumber);
 

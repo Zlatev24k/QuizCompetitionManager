@@ -112,7 +112,7 @@ else
                                                 formmethod="post"
                                                 name="registrationId"
                                                 value="@row.RegistrationId"
-                                                class="btn btn-sm btn-outline-danger"
+                                                class="btn btn-sm btn-outline-danger align-self-center"
                                                 onclick="return confirm('Сигурен ли си?');">
                                             Премахни
                                         </button>
@@ -128,6 +128,8 @@ else
                                            class="form-control text-center"
                                            type="number"
                                            min="0"
+                                           max="20"
+                                           step="1"
                                            disabled="@(!isEditable)" />
                                 </td>
                             }
