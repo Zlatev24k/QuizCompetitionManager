@@ -125,12 +125,14 @@ else
                                 <td class="text-center" style="max-width:120px;">
                                     <input type="hidden" asp-for="Teams[@i].RoundPoints[@j].RoundNumber" />
                                     <input asp-for="Teams[@i].RoundPoints[@j].Points"
-                                           class="form-control text-center"
+                                           class="form-control text-center score-input"
                                            type="number"
                                            min="0"
                                            max="20"
                                            step="1"
-                                           disabled="@(!isEditable)" />
+                                           disabled="@(!isEditable)" 
+                                           oninput="this.setCustomValidity(''); validateScore(this);"
+                                           oninvalid="setBgValidationMessage(this);" />
                                 </td>
                             }
 
@@ -150,4 +152,31 @@ else
             </div>
         }
     </form>
+}
+@section Scripts {
+    <script>
+        function setBgValidationMessage(el) {
+            if (el.validity.valueMissing) {
+                el.setCustomValidity('Това поле е задължително.');
+            } else if (el.validity.rangeUnderflow) {
+                el.setCustomValidity('Стойността не може да е по-малка от 0.');
+            } else if (el.validity.rangeOverflow) {
+                el.setCustomValidity('Стойността не може да е повече от 20.');
+            } else if (el.validity.stepMismatch) {
+                el.setCustomValidity('Моля, въведи цяло число.');
+            } else {
+                el.setCustomValidity('Невалидна стойност.');
+            }
+        }
+
+        function validateScore(el) {
+            el.classList.toggle('is-invalid', !el.checkValidity());
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.score-input').forEach(i => {
+                i.classList.toggle('is-invalid', !i.checkValidity());
+            });
+        });
+    </script>
 }
