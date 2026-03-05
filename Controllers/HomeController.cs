@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using QuizCompetitionManager.Data;
 using QuizCompetitionManager.Models;
 using QuizCompetitionManager.Models.ViewModels;
+using QuizCompetitionManager.Helpers;
 using System.Diagnostics;
 
 namespace QuizCompetitionManager.Controllers
@@ -87,14 +88,13 @@ namespace QuizCompetitionManager.Controllers
                     .Include(r => r.RoundScores)
                     .ToListAsync();
 
-                vm.Ranking = regs
-                    .Select(r => new RankingRowVM
-                    {
-                        TeamName = r.Team!.Name,
-                        TotalPoints = r.RoundScores.Sum(s => s.Points)
-                    })
-                    .OrderByDescending(r => r.TotalPoints)
-                    .ToList();
+                var ranked = RankingHelper.BuildRanking(regs, comp.RoundsCount);
+
+                vm.Ranking = ranked.Select(r => new RankingRowVM
+                {
+                    TeamName = r.TeamName,
+                    TotalPoints = r.TotalPoints
+                }).ToList();
             }
 
             return View(vm);

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using QuizCompetitionManager.Data;
 using QuizCompetitionManager.Models;
 using QuizCompetitionManager.Models.ViewModels;
+using QuizCompetitionManager.Helpers;
 
 namespace QuizCompetitionManager.Controllers
 {
@@ -84,20 +85,13 @@ namespace QuizCompetitionManager.Controllers
 
                     item.TeamsCount = allRegs.Count;
 
-                    var ranking = allRegs
-                        .Select(r => new
-                        {
-                            TeamId = r.TeamId,
-                            Total = r.RoundScores.Sum(s => s.Points)
-                        })
-                        .OrderByDescending(x => x.Total)
-                        .ToList();
+                    var ranked = RankingHelper.BuildRanking(allRegs, comp.RoundsCount);
 
-                    if (ranking.Any(x => x.Total > 0))
+                    if (ranked.Any(x => x.TotalPoints > 0))
                     {
-                        var myTotal = ranking.First(x => x.TeamId == team.Id).Total;
-                        var pos = 1 + ranking.Count(x => x.Total > myTotal);
-                        item.Position = pos;
+                        var index = ranked.FindIndex(x => x.TeamId == team.Id); 
+                        if (index >= 0)
+                            item.Position = index + 1;
                     }
                 }
 
