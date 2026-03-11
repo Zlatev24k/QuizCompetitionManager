@@ -126,5 +126,47 @@ namespace QuizCompetitionManager.Controllers
             await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        public async Task<IActionResult> EditName()
+        {
+            var userId = _userManager.GetUserId(User)!;
+
+            var team = await _db.Teams.FirstOrDefaultAsync(t => t.OwnerUserId == userId);
+            if (team == null)
+                return RedirectToAction(nameof(Create));
+
+            return View(team);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditName(int id, string name)
+        {
+            name = (name ?? string.Empty).Trim();
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                ModelState.AddModelError("", "Името на отбора е задължително.");
+            }
+            else if (name.Length > 80)
+            {
+                ModelState.AddModelError("", "Името на отбора е твърде дълго (макс. 80 символа).");
+            }
+
+            var userId = _userManager.GetUserId(User)!;
+
+            var team = await _db.Teams.FirstOrDefaultAsync(t => t.Id == id && t.OwnerUserId == userId);
+            if (team == null)
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return View(team);
+
+            team.Name = name;
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = "Името на отбора беше обновено успешно.";
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
