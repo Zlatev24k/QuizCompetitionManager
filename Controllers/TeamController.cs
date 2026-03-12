@@ -62,6 +62,13 @@ namespace QuizCompetitionManager.Controllers
             if (existing)
                 return RedirectToAction(nameof(Index));
 
+            var nameExists = await _db.Teams.AnyAsync(t => t.Name.ToLower() == name.ToLower());
+            if (nameExists)
+            {
+                ModelState.AddModelError("", "Вече съществува отбор с това име.");
+                return View();
+            }
+
             var team = new Team
             {
                 Name = name,
@@ -161,6 +168,14 @@ namespace QuizCompetitionManager.Controllers
 
             if (!ModelState.IsValid)
                 return View(team);
+
+            var nameExists = await _db.Teams.AnyAsync(t => t.Id != id && t.Name.ToLower() == name.ToLower());
+            if (nameExists)
+            {
+                ModelState.AddModelError("", "Вече съществува отбор с това име.");
+                team.Name = name;
+                return View(team);
+            }
 
             team.Name = name;
             await _db.SaveChangesAsync();

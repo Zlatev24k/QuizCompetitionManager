@@ -26,6 +26,10 @@ namespace QuizCompetitionManager.Data
                 .HasIndex(t => t.OwnerUserId)
                 .IsUnique();
 
+            builder.Entity<Team>()
+                .HasIndex(t => t.Name)
+                .IsUnique();
+
             // TeamMember
             builder.Entity<TeamMember>()
                 .HasOne(m => m.Team)
