@@ -33,14 +33,15 @@ namespace QuizCompetitionManager.Controllers
             return View(team);
         }
 
-        public IActionResult Create()
+        public IActionResult Create(string? returnUrl = null)
         {
+            ViewBag.ReturnUrl = returnUrl;
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(string name)
+        public async Task<IActionResult> Create(string name, string? returnUrl = null)
         {
             name = (name ?? string.Empty).Trim();
 
@@ -77,6 +78,12 @@ namespace QuizCompetitionManager.Controllers
 
             _db.Teams.Add(team);
             await _db.SaveChangesAsync();
+
+            TempData.Remove("Error");
+            TempData["Success"] = "Отборът беше създаден успешно. Вече можеш да се запишеш за състезание.";
+
+            if (!string.IsNullOrEmpty(returnUrl))
+                return Redirect(returnUrl);
 
             return RedirectToAction(nameof(Index));
         }

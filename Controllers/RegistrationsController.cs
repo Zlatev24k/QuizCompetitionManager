@@ -39,8 +39,12 @@ namespace QuizCompetitionManager.Controllers
             var team = await _db.Teams.FirstOrDefaultAsync(t => t.OwnerUserId == userId);
             if (team == null)
             {
-                TempData["Error"] = "За да се запишеш, първо трябва да създадеш отбор.";
-                return RedirectToAction("Create", "Team");
+                TempData["Error"] = "За да се запишеш за състезание, първо трябва да създадеш отбор.";
+                return RedirectToAction(
+                    "Create",
+                    "Team",
+                    new { returnUrl = Url.Action("Competitions", "Home") }
+);
             }
 
             var already = await _db.CompetitionRegistrations
