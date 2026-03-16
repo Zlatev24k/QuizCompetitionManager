@@ -48,7 +48,11 @@ else
             <form asp-action="Finish" method="post" class="mb-0">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="id" value="@Model.CompetitionId" />
-                <button class="btn btn-danger" type="submit">Приключи</button>
+                <button class="btn btn-danger"
+                        type="submit"
+                        onclick="return confirm('Сигурен ли си, че искаш да приключиш състезанието? След това редакцията на точките ще бъде заключена.');">
+                    Приключи
+                </button>
             </form>
         }
     </div>
