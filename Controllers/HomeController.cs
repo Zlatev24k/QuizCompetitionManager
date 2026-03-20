@@ -68,8 +68,9 @@ namespace QuizCompetitionManager.Controllers
             return View();
         }
 
-        public async Task<IActionResult> CompetitionDetails(int id)
+        public async Task<IActionResult> CompetitionDetails(int id, string? returnUrl = null)
         {
+            ViewBag.ReturnUrl = returnUrl;
             var comp = await _db.Competitions
         .FirstOrDefaultAsync(c => c.Id == id);
 

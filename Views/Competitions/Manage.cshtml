@@ -43,6 +43,14 @@ else
 
         <a class="btn btn-outline-secondary ms-auto" asp-action="Index">Към списъка</a>
 
+        <a class="btn btn-outline-primary"
+               asp-controller="Home"
+               asp-action="CompetitionDetails"
+               asp-route-id="@Model.CompetitionId"
+               asp-route-returnUrl="@Url.Action("Manage", "Competitions", new { id = Model.CompetitionId })">
+            Класиране
+        </a>
+
         @if (Model.Status == CompetitionStatus.Active)
         {
             <form asp-action="Finish" method="post" class="mb-0">
