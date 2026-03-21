@@ -4,8 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using QuizCompetitionManager.Data;
 using QuizCompetitionManager.Models;
 using QuizCompetitionManager.Models.ViewModels;
-using QuizCompetitionManager.Data;
-using QuizCompetitionManager.Models;
+using QuizCompetitionManager.Helpers;
 
 namespace QuizCompetitionManager.Controllers
 {
@@ -66,9 +65,34 @@ namespace QuizCompetitionManager.Controllers
         // DETAILS
         public async Task<IActionResult> Details(int id)
         {
-            var comp = await _db.Competitions.FirstOrDefaultAsync(c => c.Id == id);
+            var comp = await _db.Competitions
+                .FirstOrDefaultAsync(c => c.Id == id);
+
             if (comp == null) return NotFound();
-            return View(comp);
+
+            var vm = new AdminCompetitionDetailsVM
+            {
+                Competition = comp
+            };
+
+            if (comp.Status != CompetitionStatus.Planned)
+            {
+                var regs = await _db.CompetitionRegistrations
+                    .Where(r => r.CompetitionId == id)
+                    .Include(r => r.Team)
+                    .Include(r => r.RoundScores)
+                    .ToListAsync();
+
+                var ranked = RankingHelper.BuildRanking(regs, comp.RoundsCount);
+
+                vm.Ranking = ranked.Select(r => new AdminRankingRowVM
+                {
+                    TeamName = r.TeamName,
+                    TotalPoints = r.TotalPoints
+                }).ToList();
+            }
+
+            return View(vm);
         }
 
         // DELETE
