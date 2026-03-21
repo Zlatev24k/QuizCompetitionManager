@@ -35,6 +35,12 @@ namespace QuizCompetitionManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Competition model)
         {
+            if (model.Status != CompetitionStatus.Finished && model.StartDateTime < DateTime.Now)
+            {
+                ModelState.AddModelError(nameof(model.StartDateTime),
+                    "Не може да създадеш състезание със задна дата, освен ако статусът не е 'Finished'.");
+            }
+
             if (!ModelState.IsValid) return View(model);
 
             _db.Competitions.Add(model);
@@ -55,6 +61,13 @@ namespace QuizCompetitionManager.Controllers
         public async Task<IActionResult> Edit(int id, Competition model)
         {
             if (id != model.Id) return BadRequest();
+
+            if (model.Status != CompetitionStatus.Finished && model.StartDateTime < DateTime.Now)
+            {
+                ModelState.AddModelError(nameof(model.StartDateTime),
+                    "Не може да зададеш дата в миналото, освен ако статусът не е 'Finished'.");
+            }
+
             if (!ModelState.IsValid) return View(model);
 
             _db.Entry(model).State = EntityState.Modified;

@@ -21,8 +21,10 @@
 
             <div class="mb-3">
                 <label asp-for="StartDateTime" class="form-label">Дата/час</label>
-                <input asp-for="StartDateTime" type="datetime-local" class="form-control"
-                       value="@Model.StartDateTime.ToString("yyyy-MM-ddTHH:mm")" />
+                <input asp-for="StartDateTime" id="startDateTime" type="datetime-local" class="form-control"
+                       value="@Model.StartDateTime.ToString("yyyy-MM-ddTHH:mm")"
+                       oninvalid="if(this.validity.rangeUnderflow){this.setCustomValidity('Моля въведете дата и час, които са след текущите такива!');}"
+                       oninput="this.setCustomValidity('');" />
                 <span asp-validation-for="StartDateTime" class="text-danger"></span>
             </div>
 
@@ -34,7 +36,7 @@
 
             <div class="mb-3">
                 <label asp-for="Status" class="form-label">Статус</label>
-                <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<CompetitionStatus>()"></select>
+                <select asp-for="Status" id="statusSelect" class="form-select" asp-items="Html.GetEnumSelectList<CompetitionStatus>()"></select>
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
 
@@ -48,4 +50,34 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function updateDateRestriction() {
+            const status = document.getElementById("statusSelect");
+            const dateInput = document.getElementById("startDateTime");
+
+            if (!status || !dateInput) return;
+
+            const now = new Date();
+
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const hh = String(now.getHours()).padStart(2, '0');
+            const mi = String(now.getMinutes()).padStart(2, '0');
+
+            const minValue = `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+
+            if (status.value === "2") {
+                dateInput.removeAttribute("min");
+            } else {
+                dateInput.min = minValue;
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            updateDateRestriction();
+            document.getElementById("statusSelect")?.addEventListener("change", updateDateRestriction);
+        });
+    </script>
 }
