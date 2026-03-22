@@ -20,7 +20,7 @@
 
             <div class="mb-3">
                 <label asp-for="StartDateTime" class="form-label">Дата/час</label>
-                <input asp-for="StartDateTime" id="startDateTime" type="datetime-local" class="form-control"
+                <input asp-for="StartDateTime" id="startDateTime" type="text" class="form-control"
                        value="@Model.StartDateTime.ToString("yyyy-MM-ddTHH:mm")" 
                        oninvalid="if(this.validity.rangeUnderflow){this.setCustomValidity('Моля въведете дата и час, които са след текущите такива!');}"
                        oninput="this.setCustomValidity('');" />
@@ -75,6 +75,36 @@
         }
 
         document.addEventListener("DOMContentLoaded", function () {
+            updateDateRestriction();
+            document.getElementById("statusSelect")?.addEventListener("change", updateDateRestriction);
+        });
+    </script>
+
+    <script>
+        function updateDateRestriction() {
+            const status = document.getElementById("statusSelect");
+            const dateInput = document.getElementById("startDateTime");
+
+            if (!status || !dateInput || !dateInput._flatpickr) return;
+
+            const now = new Date();
+
+            if (status.value === "2") {
+                dateInput._flatpickr.set("minDate", null);
+            } else {
+                dateInput._flatpickr.set("minDate", now);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            flatpickr("#startDateTime", {
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                time_24hr: true,
+                locale: "bg",
+                disableMobile: true
+            });
+
             updateDateRestriction();
             document.getElementById("statusSelect")?.addEventListener("change", updateDateRestriction);
         });
