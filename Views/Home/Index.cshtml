@@ -1,8 +1,98 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Начало";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="hero-section">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+            <div class="hero-card">
+                <span class="section-badge">Онлайн система за куиз състезания</span>
+                <h1 class="hero-title">
+                    Организирай, управлявай и следи отборни куиз състезания на едно място
+                </h1>
+                <p class="hero-text">
+                    Платформа за създаване на състезания, записване на отбори, оценяване по кръгове
+                    и проследяване на резултатите в подреден и удобен интерфейс.
+                </p>
+
+                <div class="hero-actions">
+                    <a asp-controller="Home" asp-action="Competitions" class="btn btn-primary btn-lg me-2 mb-2">
+                        Виж състезания
+                    </a>
+                    <a asp-controller="Home" asp-action="Rules" class="btn btn-outline-primary btn-lg mb-2">
+                        Виж правилата
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="info-panel">
+                <h3 class="panel-title">Какво предлага системата?</h3>
+                <ul class="feature-list">
+                    <li>Създаване и управление на куиз състезания</li>
+                    <li>Регистрация и участие на отбори</li>
+                    <li>Въвеждане на точки по кръгове</li>
+                    <li>Автоматично класиране и резултати</li>
+                    <li>Ясен и удобен интерфейс за организатори и участници</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mt-5">
+    <div class="text-center mb-4">
+        <h2 class="section-title">Основни възможности</h2>
+        <p class="section-subtitle">
+            Системата е създадена да улесни както организаторите, така и участващите отбори.
+        </p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="feature-card h-100">
+                <div class="feature-icon">1</div>
+                <h4>Управление на състезания</h4>
+                <p>
+                    Създавай нови състезания, редактирай детайли и следи техния статус
+                    през целия им жизнен цикъл.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="feature-card h-100">
+                <div class="feature-icon">2</div>
+                <h4>Отбори и записване</h4>
+                <p>
+                    Регистрираните потребители могат лесно да създадат отбор и да се
+                    включат в предстоящи куиз събития.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="feature-card h-100">
+                <div class="feature-icon">3</div>
+                <h4>Резултати и класиране</h4>
+                <p>
+                    Въвеждай резултати по кръгове и получавай подредено крайно класиране
+                    с ясна визуализация.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section mt-5">
+    <div class="cta-card text-center">
+        <h3>Готов ли си да започнеш?</h3>
+        <p>
+            Разгледай активните състезания или влез в профила си, за да управляваш своя отбор.
+        </p>
+        <a asp-controller="Home" asp-action="Competitions" class="btn btn-primary btn-lg">
+            Към състезанията
+        </a>
+    </div>
+</section>
