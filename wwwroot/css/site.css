@@ -546,3 +546,46 @@ a {
     font-weight: 600;
     color: var(--text-main);
 }
+
+
+/* Rules page */
+.rules-card {
+    background: var(--white);
+    border: 1px solid rgba(219, 233, 246, 0.9);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    padding: 1.8rem 2rem;
+}
+
+.rules-card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-main);
+}
+
+.rules-card-text {
+    color: var(--text-muted);
+    line-height: 1.7;
+}
+
+.rules-list {
+    margin: 0;
+    padding-left: 1.2rem;
+    color: var(--text-muted);
+}
+
+    .rules-list li {
+        margin-bottom: 0.85rem;
+        line-height: 1.65;
+    }
+
+        .rules-list li:last-child {
+            margin-bottom: 0;
+        }
+
+@media (max-width: 767.98px) {
+    .rules-card {
+        padding: 1.4rem;
+    }
+}
