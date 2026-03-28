@@ -120,10 +120,27 @@ else
         @Html.AntiForgeryToken()
         <input type="hidden" name="competitionId" value="@Model.CompetitionId" />
 
-        <div class="d-flex flex-wrap gap-2 mb-3">
-            <button class="btn btn-primary save-all-btn" type="submit" disabled="@(!isEditable)">
-                Запази всички
-            </button>
+        <div class="save-toolbar">
+            <div class="save-toolbar-inner">
+
+                <div class="save-toolbar-text">
+                    @if (isEditable)
+                    {
+                        <span>Промените не се запазват автоматично</span>
+                    }
+                    else
+                    {
+                        <span>Редакцията е заключена</span>
+                    }
+                </div>
+
+                <button class="btn btn-primary save-all-btn"
+                        type="submit"
+                        disabled="@(!isEditable)">
+                    💾 Запази всички
+                </button>
+
+            </div>
         </div>
 
         <div class="manage-table-card">
