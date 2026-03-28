@@ -619,3 +619,142 @@ a {
         color: var(--text-main);
         font-weight: 700;
     }
+
+
+/* Manage page */
+.manage-summary-card,
+.manage-toolbar-card,
+.manage-table-card {
+    background: var(--white);
+    border: 1px solid rgba(219, 233, 246, 0.9);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+}
+
+.manage-summary-header {
+    padding: 1.4rem 1.6rem 0 1.6rem;
+}
+
+.manage-summary-body {
+    padding: 1rem 1.6rem 1.5rem 1.6rem;
+}
+
+.manage-summary-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.manage-summary-subtitle {
+    color: var(--text-muted);
+}
+
+.manage-toolbar-card {
+    padding: 1.2rem 1.4rem;
+}
+
+.manage-toolbar-text {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.toolbar-state {
+    display: inline-block;
+    font-weight: 600;
+}
+
+.toolbar-state-active {
+    color: #198754;
+}
+
+.toolbar-state-locked {
+    color: #6c757d;
+}
+
+.save-all-btn {
+    border-radius: 999px;
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+}
+
+.manage-table-card {
+    overflow: hidden;
+}
+
+.manage-points-table {
+    --bs-table-bg: transparent;
+}
+
+    .manage-points-table thead th {
+        border-bottom: 1px solid var(--border-soft);
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 0.95rem;
+        padding: 1rem 0.85rem;
+        background-color: #fbfdff;
+        white-space: nowrap;
+    }
+
+    .manage-points-table tbody td {
+        padding: 1rem 0.85rem;
+        border-color: #edf4fb;
+        vertical-align: middle;
+    }
+
+    .manage-points-table tbody tr:hover {
+        background-color: #f8fbff;
+    }
+
+.team-cell {
+    min-width: 280px;
+}
+
+.team-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.team-members {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin-top: 0.35rem;
+    line-height: 1.5;
+}
+
+.points-cell {
+    min-width: 95px;
+}
+
+.score-input-custom {
+    border-radius: 12px;
+    border: 1px solid var(--border-soft);
+    font-weight: 600;
+    min-width: 72px;
+}
+
+    .score-input-custom:disabled {
+        background-color: #f3f6fa;
+        color: #6c757d;
+    }
+
+.total-cell {
+    min-width: 90px;
+}
+
+.total-points-badge {
+    min-width: 48px;
+    display: inline-block;
+    text-align: center;
+}
+
+@media (max-width: 991.98px) {
+    .manage-summary-header {
+        padding: 1.2rem 1.2rem 0 1.2rem;
+    }
+
+    .manage-summary-body,
+    .manage-toolbar-card {
+        padding: 1.2rem;
+    }
+}

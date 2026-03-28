@@ -4,167 +4,221 @@
 @{
     ViewData["Title"] = "Управление на точки";
     var isEditable = Model.Status == CompetitionStatus.Active;
+
+    var statusText = Model.Status == CompetitionStatus.Planned ? "Предстоящо"
+        : Model.Status == CompetitionStatus.Active ? "Активно"
+        : Model.Status == CompetitionStatus.Finished ? "Приключило"
+        : Model.Status.ToString();
 }
 
-<h2 class="mb-2">Управление на точки</h2>
+<section class="page-hero-small mb-4">
+    <div class="page-hero-small-card">
+        <h1 class="page-title mb-2">Управление на точки</h1>
+        <p class="page-subtitle mb-0">
+            Въвеждане, редактиране и финализиране на резултатите за състезанието.
+        </p>
+    </div>
+</section>
 
-<div class="text-muted mb-3">
-    <strong>@Model.CompetitionName</strong> • @Model.StartDateTime.ToString("dd.MM.yyyy HH:mm")
-    • Кръгове: @Model.RoundsCount • Статус: @Model.Status
+<div class="manage-summary-card mb-4">
+    <div class="manage-summary-header">
+        <div>
+            <h3 class="manage-summary-title mb-1">@Model.CompetitionName</h3>
+            <p class="manage-summary-subtitle mb-0">
+                Работна зона за администратор.
+            </p>
+        </div>
+    </div>
+
+    <div class="manage-summary-body">
+        <div class="competition-inline-info">
+            <div class="inline-item">
+                <span class="inline-label">Дата и час:</span>
+                <span class="inline-value">@Model.StartDateTime.ToString("dd.MM.yyyy HH:mm")</span>
+            </div>
+
+            <div class="inline-item">
+                <span class="inline-label">Брой кръгове:</span>
+                <span class="inline-value">@Model.RoundsCount</span>
+            </div>
+
+            <div class="inline-item">
+                <span class="inline-label">Статус:</span>
+                <span class="status-badge status-@Model.Status.ToString().ToLower()">@statusText</span>
+            </div>
+        </div>
+    </div>
 </div>
 
 @if (TempData["Success"] != null)
 {
-    <div class="alert alert-success">@TempData["Success"]</div>
+    <div class="alert alert-success custom-alert" role="alert">
+        @TempData["Success"]
+    </div>
 }
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger">@TempData["Error"]</div>
+    <div class="alert alert-danger custom-alert" role="alert">
+        @TempData["Error"]
+    </div>
 }
 
 @if (!Model.Teams.Any())
 {
-    <div class="alert alert-info">Няма записани отбори за това състезание.</div>
-    <a class="btn btn-outline-secondary" asp-action="Index">Назад</a>
+    <div class="empty-admin-state mb-3">
+        <h4 class="mb-2">Няма записани отбори</h4>
+        <p class="mb-0">Все още няма участници за това състезание.</p>
+    </div>
+
+    <a class="btn btn-outline-primary action-btn" asp-action="Index">Назад</a>
 }
 else
 {
-    <div class="d-flex gap-2 mb-3 align-items-center">
-        <span class="text-muted">
-            @if (isEditable)
-            {
-                <text>Можеш да въвеждаш и запазваш точки.</text>
-            }
-            else
-            {
-                <text>Редакцията е заключена (не е активно).</text>
-            }
-        </span>
+    <div class="manage-toolbar-card mb-4">
+        <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3 justify-content-between">
+            <div class="manage-toolbar-text">
+                @if (isEditable)
+                {
+                    <span class="toolbar-state toolbar-state-active">Можеш да въвеждаш и запазваш точки.</span>
+                }
+                else
+                {
+                    <span class="toolbar-state toolbar-state-locked">Редакцията е заключена, защото състезанието не е активно.</span>
+                }
+            </div>
 
-        <a class="btn btn-outline-secondary ms-auto" asp-action="Index">Към списъка</a>
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-outline-primary action-btn" asp-action="Index">
+                    Към списъка
+                </a>
 
-        <a class="btn btn-outline-primary"
-               asp-controller="Home"
-               asp-action="CompetitionDetails"
-               asp-route-id="@Model.CompetitionId"
-               asp-route-returnUrl="@Url.Action("Manage", "Competitions", new { id = Model.CompetitionId })">
-            Класиране
-        </a>
+                <a class="btn btn-outline-primary action-btn"
+                       asp-controller="Home"
+                       asp-action="CompetitionDetails"
+                       asp-route-id="@Model.CompetitionId"
+                       asp-route-returnUrl="@Url.Action("Manage", "Competitions", new { id = Model.CompetitionId })">
+                    Класиране
+                </a>
 
-        @if (Model.Status == CompetitionStatus.Active)
-        {
-            <form asp-action="Finish" method="post" class="mb-0">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="id" value="@Model.CompetitionId" />
-                <button class="btn btn-danger"
-                        type="submit"
-                        onclick="return confirm('Сигурен ли си, че искаш да приключиш състезанието? След това редакцията на точките ще бъде заключена.');">
-                    Приключи
-                </button>
-            </form>
-        }
+                @if (Model.Status == CompetitionStatus.Active)
+                {
+                    <form asp-action="Finish" method="post" class="mb-0">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.CompetitionId" />
+                        <button class="btn btn-danger action-btn"
+                                type="submit"
+                                onclick="return confirm('Сигурен ли си, че искаш да приключиш състезанието? След това редакцията на точките ще бъде заключена.');">
+                            Приключи
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
     </div>
 
     <form asp-controller="Competitions" asp-action="SaveAll" method="post">
         @Html.AntiForgeryToken()
         <input type="hidden" name="competitionId" value="@Model.CompetitionId" />
 
-        <div class="d-flex gap-2 mb-3">
-            <button class="btn btn-primary" type="submit" disabled="@(!isEditable)">
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            <button class="btn btn-primary save-all-btn" type="submit" disabled="@(!isEditable)">
                 Запази всички
             </button>
         </div>
 
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th>Отбор</th>
-                        @for (int r = 1; r <= Model.RoundsCount; r++)
-                        {
-                            <th class="text-center">Кръг @r</th>
-                        }
-                        <th class="text-center">Общо</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @for (int i = 0; i < Model.Teams.Count; i++)
-                    {
-                        var row = Model.Teams[i];
-                        var total = row.RoundPoints.Sum(x => x.Points);
-
+        <div class="manage-table-card">
+            <div class="table-responsive">
+                <table class="table manage-points-table align-middle mb-0">
+                    <thead>
                         <tr>
-                            <td>
-                                <div class="d-flex justify-content-between align-items-start gap-2">
-                                    <div>
-                                        <strong>@row.TeamName</strong>
-
-                                        @if (row.Members != null && row.Members.Any())
-                                        {
-                                            <div class="small text-muted mt-1">
-                                                @string.Join(", ", row.Members)
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <div class="small text-muted mt-1">
-                                                Няма добавени членове.
-                                            </div>
-                                        }
-
-                                        <input type="hidden" asp-for="Teams[@i].RegistrationId" />
-                                        <input type="hidden" asp-for="Teams[@i].TeamName" />
-                                    </div>
-
-                                    @if (Model.Status != CompetitionStatus.Finished)
-                                    {
-                                        <button type="submit"
-                                                formaction="@Url.Action("RemoveTeam", "Competitions")"
-                                                formmethod="post"
-                                                name="registrationId"
-                                                value="@row.RegistrationId"
-                                                class="btn btn-sm btn-outline-danger align-self-center"
-                                                onclick="return confirm('Сигурен ли си?');">
-                                            Премахни
-                                        </button>
-                                    }
-                                </div>
-                            </td>
-
-                            @for (int j = 0; j < row.RoundPoints.Count; j++)
+                            <th>Отбор</th>
+                            @for (int r = 1; r <= Model.RoundsCount; r++)
                             {
-                                <td class="text-center" style="max-width:120px;">
-                                    <input type="hidden" asp-for="Teams[@i].RoundPoints[@j].RoundNumber" />
-                                    <input asp-for="Teams[@i].RoundPoints[@j].Points"
-                                           class="form-control text-center score-input"
-                                           type="number"
-                                           min="0"
-                                           max="20"
-                                           step="1"
-                                           disabled="@(!isEditable)" 
-                                           oninput="this.setCustomValidity(''); validateScore(this);"
-                                           oninvalid="setBgValidationMessage(this);" />
-                                </td>
+                                <th class="text-center">Кръг @r</th>
                             }
-
-                            <td class="text-center">
-                                <span class="badge bg-dark">@total</span>
-                            </td>
+                            <th class="text-center">Общо</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+
+                    <tbody>
+                        @for (int i = 0; i < Model.Teams.Count; i++)
+                        {
+                            var row = Model.Teams[i];
+                            var total = row.RoundPoints.Sum(x => x.Points);
+
+                            <tr>
+                                <td class="team-cell">
+                                    <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                                        <div>
+                                            <div class="team-name">@row.TeamName</div>
+
+                                            @if (row.Members != null && row.Members.Any())
+                                            {
+                                                <div class="team-members">
+                                                    @string.Join(", ", row.Members)
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="team-members">
+                                                    Няма добавени членове.
+                                                </div>
+                                            }
+
+                                            <input type="hidden" asp-for="Teams[@i].RegistrationId" />
+                                            <input type="hidden" asp-for="Teams[@i].TeamName" />
+                                        </div>
+
+                                        @if (Model.Status != CompetitionStatus.Finished)
+                                        {
+                                            <button type="submit"
+                                                    formaction="@Url.Action("RemoveTeam", "Competitions")"
+                                                    formmethod="post"
+                                                    name="registrationId"
+                                                    value="@row.RegistrationId"
+                                                    class="btn btn-sm btn-outline-danger action-btn"
+                                                    onclick="return confirm('Сигурен ли си?');">
+                                                Премахни
+                                            </button>
+                                        }
+                                    </div>
+                                </td>
+
+                                @for (int j = 0; j < row.RoundPoints.Count; j++)
+                                {
+                                    <td class="text-center points-cell">
+                                        <input type="hidden" asp-for="Teams[@i].RoundPoints[@j].RoundNumber" />
+                                        <input asp-for="Teams[@i].RoundPoints[@j].Points"
+                                               class="form-control text-center score-input score-input-custom"
+                                               type="number"
+                                               min="0"
+                                               max="20"
+                                               step="1"
+                                               disabled="@(!isEditable)"
+                                               oninput="this.setCustomValidity(''); validateScore(this);"
+                                               oninvalid="setBgValidationMessage(this);" />
+                                    </td>
+                                }
+
+                                <td class="text-center total-cell">
+                                    <span class="points-badge total-points-badge">@total</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         @if (!isEditable)
         {
-            <div class="alert alert-secondary mt-3 mb-0">
+            <div class="alert alert-secondary custom-alert mt-3 mb-0">
                 Редакцията е заключена, защото състезанието не е активно.
             </div>
         }
     </form>
 }
+
 @section Scripts {
     <script>
         function setBgValidationMessage(el) {
