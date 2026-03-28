@@ -589,3 +589,33 @@ a {
         padding: 1.4rem;
     }
 }
+
+/* Admin competitions page */
+.admin-create-btn {
+    border-radius: 999px;
+    padding: 0.8rem 1.25rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.admin-table-card {
+    background: var(--white);
+    border: 1px solid rgba(219, 233, 246, 0.9);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+}
+
+.empty-admin-state {
+    background: var(--white);
+    border: 1px solid rgba(219, 233, 246, 0.9);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    padding: 2rem;
+    color: var(--text-muted);
+}
+
+    .empty-admin-state h4 {
+        color: var(--text-main);
+        font-weight: 700;
+    }

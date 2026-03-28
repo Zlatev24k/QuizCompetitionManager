@@ -2,67 +2,108 @@
 @using QuizCompetitionManager.Models
 
 @{
-    ViewData["Title"] = "Състезания";
+    ViewData["Title"] = "Управление на състезания";
 }
+
+<section class="page-hero-small mb-4">
+    <div class="page-hero-small-card d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+        <div>
+            <h1 class="page-title mb-2">Управление на състезания</h1>
+            <p class="page-subtitle mb-0">
+                Създаване, редактиране, стартиране и управление на куиз състезания.
+            </p>
+        </div>
+        <div>
+            <a class="btn btn-primary admin-create-btn" asp-action="Create">+ Ново състезание</a>
+        </div>
+    </div>
+</section>
 
 @if (TempData["Success"] != null)
 {
-    <div class="alert alert-success">@TempData["Success"]</div>
+    <div class="alert alert-success custom-alert" role="alert">
+        @TempData["Success"]
+    </div>
 }
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger">@TempData["Error"]</div>
+    <div class="alert alert-danger custom-alert" role="alert">
+        @TempData["Error"]
+    </div>
 }
-
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">Състезания</h2>
-    <a class="btn btn-primary" asp-action="Create">+ Ново състезание</a>
-</div>
 
 @if (!Model.Any())
 {
-    <div class="alert alert-info">Няма създадени състезания.</div>
+    <div class="empty-admin-state">
+        <h4 class="mb-2">Няма създадени състезания</h4>
+        <p class="mb-0">Създай първото състезание, за да започнеш управлението на системата.</p>
+    </div>
 }
 else
 {
-    <table class="table table-striped table-hover align-middle">
-        <thead>
-            <tr>
-                <th>Име</th>
-                <th>Дата/час</th>
-                <th>Кръгове</th>
-                <th>Статус</th>
-                <th class="text-end">Действия</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var c in Model)
-            {
-                <tr>
-                    <td>@c.Name</td>
-                    <td>@c.StartDateTime.ToString("dd.MM.yyyy HH:mm")</td>
-                    <td>@c.RoundsCount</td>
-                    <td>
-                        <span class="badge bg-secondary">@c.Status</span>
-                    </td>
-                    <td class="text-end">
-                        <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@c.Id">Детайли</a>
-                        <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@c.Id">Редакция</a>
-                        <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@c.Id">Изтрий</a>
-                        @if (c.Status == CompetitionStatus.Planned)
-                        {
-                            <form asp-action="Start" method="post" class="d-inline">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@c.Id" />
-                                <button type="submit" class="btn btn-sm btn-success">
-                                    Стартирай
-                                </button>
-                            </form>
-                        }
-                        <a class="btn btn-sm btn-outline-dark" asp-action="Manage" asp-route-id="@c.Id">Управление</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="admin-table-card">
+        <div class="table-responsive">
+            <table class="table custom-competition-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Име</th>
+                        <th>Дата и час</th>
+                        <th>Кръгове</th>
+                        <th>Статус</th>
+                        <th class="text-end">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model)
+                    {
+                        var statusText = c.Status == CompetitionStatus.Planned ? "Предстоящо"
+                            : c.Status == CompetitionStatus.Active ? "Активно"
+                            : c.Status == CompetitionStatus.Finished ? "Приключило"
+                            : c.Status.ToString();
+
+                        <tr>
+                            <td class="fw-semibold">@c.Name</td>
+                            <td>@c.StartDateTime.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@c.RoundsCount</td>
+                            <td>
+                                <span class="status-badge status-@c.Status.ToString().ToLower()">
+                                    @statusText
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end flex-wrap gap-2">
+                                    <a class="btn btn-sm btn-outline-primary action-btn" asp-action="Details" asp-route-id="@c.Id">
+                                        Детайли
+                                    </a>
+
+                                    <a class="btn btn-sm btn-outline-primary action-btn" asp-action="Edit" asp-route-id="@c.Id">
+                                        Редакция
+                                    </a>
+
+                                    <a class="btn btn-sm btn-outline-danger action-btn" asp-action="Delete" asp-route-id="@c.Id">
+                                        Изтрий
+                                    </a>
+
+                                    @if (c.Status == CompetitionStatus.Planned)
+                                    {
+                                        <form asp-action="Start" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@c.Id" />
+                                            <button type="submit" class="btn btn-sm btn-success action-btn">
+                                                Стартирай
+                                            </button>
+                                        </form>
+                                    }
+
+                                    <a class="btn btn-sm btn-dark action-btn" asp-action="Manage" asp-route-id="@c.Id">
+                                        Управление
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 }
