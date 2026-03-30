@@ -1,9 +1,16 @@
-﻿namespace QuizCompetitionManager.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace QuizCompetitionManager.Models
 {
     public enum CompetitionStatus
     {
-        Planned = 0,
-        Active = 1,
-        Finished = 2
+        [Display(Name = "Предстоящо")]
+        Planned,
+
+        [Display(Name = "Активно")]
+        Active,
+
+        [Display(Name = "Приключило")]
+        Finished
     }
 }
