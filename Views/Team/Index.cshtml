@@ -17,24 +17,23 @@
     </div>
 </section>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success custom-alert text-center">
-        @TempData["Success"]
-    </div>
-}
-
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger custom-alert text-center">
-        @TempData["Error"]
-    </div>
-}
-
 <div class="row justify-content-center">
     <div class="col-lg-6">
 
-        <!-- Team info -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success custom-alert text-center">
+                @TempData["Success"]
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger custom-alert text-center">
+                @TempData["Error"]
+            </div>
+        }
+
         <div class="team-overview-card text-center mb-4">
             <h3 class="manage-summary-title mb-1">@Model.Name</h3>
             <div class="team-meta-text mb-3">
@@ -46,7 +45,6 @@
             </a>
         </div>
 
-        <!-- Members list -->
         <div class="team-card mb-4">
             <div class="team-card-header text-center">
                 <h3 class="team-card-title mb-0">Списък с членове</h3>
@@ -80,7 +78,6 @@
             </div>
         </div>
 
-        <!-- Add member -->
         <div class="team-card">
             <div class="team-card-header text-center">
                 <h3 class="team-card-title mb-0">Добави член</h3>
