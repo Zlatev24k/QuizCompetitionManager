@@ -3,76 +3,103 @@
 
 @{
     ViewData["Title"] = "Детайли";
+
+    var statusText = Model.Competition.Status == CompetitionStatus.Planned ? "Предстоящо"
+        : Model.Competition.Status == CompetitionStatus.Active ? "Активно"
+        : Model.Competition.Status == CompetitionStatus.Finished ? "Приключило"
+        : Model.Competition.Status.ToString();
 }
 
-<h2 class="mb-3">Детайли за състезание</h2>
+<section class="page-hero-small mb-4">
+    <div class="page-hero-small-card">
+        <h1 class="page-title mb-2">Детайли за състезание</h1>
+        <p class="page-subtitle mb-0">
+            Подробна информация и текущо класиране за избраното състезание.
+        </p>
+    </div>
+</section>
 
-<div class="card mb-4">
-    <div class="card-body">
-        <dl class="row mb-0">
-            <dt class="col-sm-3">Име</dt>
-            <dd class="col-sm-9">@Model.Competition.Name</dd>
+<div class="competition-details-card mb-4">
+    <div class="competition-details-body">
 
-            <dt class="col-sm-3">Дата/час</dt>
-            <dd class="col-sm-9">@Model.Competition.StartDateTime.ToString("dd.MM.yyyy HH:mm")</dd>
+        <div class="mb-3">
+            <h3 class="manage-summary-title mb-1">@Model.Competition.Name</h3>
+        </div>
 
-            <dt class="col-sm-3">Брой кръгове</dt>
-            <dd class="col-sm-9">@Model.Competition.RoundsCount</dd>
+        <div class="competition-inline-info">
+            <div class="inline-item">
+                <span class="inline-label">Дата и час:</span>
+                <span class="inline-value">@Model.Competition.StartDateTime.ToString("dd.MM.yyyy HH:mm")</span>
+            </div>
 
-            <dt class="col-sm-3">Статус</dt>
-            <dd class="col-sm-9">@Model.Competition.Status</dd>
-        </dl>
+            <div class="inline-item">
+                <span class="inline-label">Брой кръгове:</span>
+                <span class="inline-value">@Model.Competition.RoundsCount</span>
+            </div>
+
+            <div class="inline-item">
+                <span class="inline-label">Статус:</span>
+                <span class="status-badge status-@Model.Competition.Status.ToString().ToLower()">
+                    @statusText
+                </span>
+            </div>
+        </div>
+
     </div>
 </div>
 
-<h4 class="mb-3">Класиране</h4>
+<h3 class="section-title mb-3">Класиране</h3>
 
 @if (Model.Competition.Status == CompetitionStatus.Planned)
 {
-    <div class="alert alert-info">
+    <div class="alert alert-info custom-alert">
         Все още няма резултати за това състезание.
     </div>
 }
 else if (!Model.Ranking.Any())
 {
-    <div class="alert alert-warning">
+    <div class="alert alert-warning custom-alert">
         Няма въведени резултати.
     </div>
 }
 else
 {
-    <table class="table table-striped align-middle">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Отбор</th>
-                <th class="text-end">Общо точки</th>
-            </tr>
-        </thead>
-        <tbody>
-            @{
-                int position = 1;
-            }
-            @foreach (var row in Model.Ranking)
-            {
-                <tr>
-                    <td>@position</td>
-                    <td>@row.TeamName</td>
-                    <td class="text-end">
-                        <span class="badge bg-dark">@row.TotalPoints</span>
-                    </td>
-                </tr>
-                position++;
-            }
-        </tbody>
-    </table>
+    <div class="ranking-card">
+        <div class="table-responsive">
+            <table class="table custom-competition-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Отбор</th>
+                        <th class="text-end">Общо точки</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int position = 1;
+                    }
+                    @foreach (var row in Model.Ranking)
+                    {
+                        <tr class="ranking-row position-@position">
+                            <td class="fw-semibold">@position</td>
+                            <td>@row.TeamName</td>
+                            <td class="text-end">
+                                <span class="points-badge">@row.TotalPoints</span>
+                            </td>
+                        </tr>
+                        position++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 }
 
-<div class="mt-3 d-flex gap-2">
-    <a class="btn btn-outline-primary" asp-action="Manage" asp-route-id="@Model.Competition.Id">
+<div class="mt-4 d-flex flex-wrap gap-2">
+    <a class="btn btn-primary action-btn" asp-action="Manage" asp-route-id="@Model.Competition.Id">
         Управление
     </a>
-    <a class="btn btn-outline-secondary" asp-action="Index">
+    <a class="btn btn-outline-primary action-btn" asp-action="Index">
         Назад
     </a>
 </div>
