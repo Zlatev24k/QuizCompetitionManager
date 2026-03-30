@@ -5,81 +5,81 @@
     ViewData["Title"] = "Редакция";
 }
 
-<h2 class="mb-3">Редакция на състезание</h2>
-
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Edit" method="post">
-            <input type="hidden" asp-for="Id" />
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <div class="mb-3">
-                <label asp-for="Name" class="form-label">Име</label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+<section class="page-hero-small mb-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-xl-6">
+            <div class="page-hero-small-card">
+                <h1 class="page-title mb-2">Редакция на състезание</h1>
+                <p class="page-subtitle mb-0">
+                    Промени основната информация за избраното куиз състезание.
+                </p>
             </div>
+        </div>
+    </div>
+</section>
 
-            <div class="mb-3">
-                <label asp-for="StartDateTime" class="form-label">Дата/час</label>
-                <input asp-for="StartDateTime" id="startDateTime" type="text" class="form-control"
-                       value="@Model.StartDateTime.ToString("yyyy-MM-ddTHH:mm")"
-                       oninvalid="if(this.validity.rangeUnderflow){this.setCustomValidity('Моля въведете дата и час, които са след текущите такива!');}"
-                       oninput="this.setCustomValidity('');" />
-                <span asp-validation-for="StartDateTime" class="text-danger"></span>
-            </div>
+<div class="row justify-content-center">
+    <div class="col-lg-7 col-xl-6">
+        <div class="form-page-card">
+            <form asp-action="Edit" method="post" id="competitionEditForm" novalidate>
+                <input type="hidden" asp-for="Id" />
+                <div asp-validation-summary="ModelOnly" class="text-danger validation-summary-custom mb-3"></div>
 
-            <div class="mb-3">
-                <label asp-for="RoundsCount" class="form-label">Брой кръгове</label>
-                <input asp-for="RoundsCount" class="form-control" />
-                <span asp-validation-for="RoundsCount" class="text-danger"></span>
-            </div>
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label custom-label">Име</label>
+                    <input asp-for="Name"
+                           class="form-control custom-input"
+                           id="competitionName" />
+                    <span asp-validation-for="Name" class="text-danger field-validation-custom"></span>
+                </div>
 
-            <div class="mb-3">
-                <label asp-for="Status" class="form-label">Статус</label>
-                <select asp-for="Status" id="statusSelect" class="form-select" asp-items="Html.GetEnumSelectList<CompetitionStatus>()"></select>
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
+                <div class="mb-3">
+                    <label asp-for="StartDateTime" class="form-label custom-label">Дата и час</label>
+                    <input asp-for="StartDateTime"
+                           id="startDateTime"
+                           type="text"
+                           class="form-control custom-input"
+                           value="@Model.StartDateTime.ToString("yyyy-MM-ddTHH:mm")" />
+                    <span asp-validation-for="StartDateTime" class="text-danger field-validation-custom"></span>
+                </div>
 
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Запази</button>
-                <a asp-action="Index" class="btn btn-outline-secondary">Назад</a>
-            </div>
-        </form>
+                <div class="mb-3">
+                    <label asp-for="RoundsCount" class="form-label custom-label">Брой кръгове</label>
+                    <input asp-for="RoundsCount"
+                           class="form-control custom-input"
+                           id="roundsCount"
+                           type="number"
+                           min="1"
+                           max="20"
+                           step="1" />
+                    <span asp-validation-for="RoundsCount" class="text-danger field-validation-custom"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Status" class="form-label custom-label">Статус</label>
+                    <select asp-for="Status"
+                            id="statusSelect"
+                            class="form-select custom-input"
+                            asp-items="Html.GetEnumSelectList<CompetitionStatus>()">
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger field-validation-custom"></span>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-primary form-action-btn">
+                        Запази
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-primary form-action-btn">
+                        Назад
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-
-    <script>
-        function updateDateRestriction() {
-            const status = document.getElementById("statusSelect");
-            const dateInput = document.getElementById("startDateTime");
-
-            if (!status || !dateInput) return;
-
-            const now = new Date();
-
-            const yyyy = now.getFullYear();
-            const mm = String(now.getMonth() + 1).padStart(2, '0');
-            const dd = String(now.getDate()).padStart(2, '0');
-            const hh = String(now.getHours()).padStart(2, '0');
-            const mi = String(now.getMinutes()).padStart(2, '0');
-
-            const minValue = `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
-
-            if (status.value === "2") {
-                dateInput.removeAttribute("min");
-            } else {
-                dateInput.min = minValue;
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", function () {
-            updateDateRestriction();
-            document.getElementById("statusSelect")?.addEventListener("change", updateDateRestriction);
-        });
-    </script>
 
     <script>
         function updateDateRestriction() {
@@ -97,7 +97,48 @@
             }
         }
 
+        function setBulgarianValidationMessage(el) {
+            if (el.validity.valueMissing) {
+                if (el.id === "competitionName") {
+                    el.setCustomValidity("Моля, въведете име на състезанието.");
+                } else if (el.id === "startDateTime") {
+                    el.setCustomValidity("Моля, въведете дата и час.");
+                } else if (el.id === "roundsCount") {
+                    el.setCustomValidity("Моля, въведете брой кръгове.");
+                } else {
+                    el.setCustomValidity("Моля, попълнете това поле.");
+                }
+            } else if (el.validity.rangeUnderflow) {
+                if (el.id === "startDateTime") {
+                    el.setCustomValidity("Моля, въведете дата и час, които са след текущите.");
+                } else if (el.id === "roundsCount") {
+                    el.setCustomValidity("Броят кръгове трябва да бъде поне 1.");
+                } else {
+                    el.setCustomValidity("Стойността е твърде малка.");
+                }
+            } else if (el.validity.rangeOverflow) {
+                if (el.id === "roundsCount") {
+                    el.setCustomValidity("Броят кръгове трябва да бъде най-много 20.");
+                } else {
+                    el.setCustomValidity("Стойността е твърде голяма.");
+                }
+            } else if (el.validity.stepMismatch) {
+                if (el.id === "roundsCount") {
+                    el.setCustomValidity("Моля, въведете цяло число за брой кръгове.");
+                } else {
+                    el.setCustomValidity("Моля, въведете валидна стойност.");
+                }
+            } else if (el.validity.badInput) {
+                el.setCustomValidity("Моля, въведете валидна стойност.");
+            } else {
+                el.setCustomValidity("");
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("competitionEditForm");
+            const statusSelect = document.getElementById("statusSelect");
+
             flatpickr("#startDateTime", {
                 enableTime: true,
                 dateFormat: "Y-m-d H:i",
@@ -107,7 +148,27 @@
             });
 
             updateDateRestriction();
-            document.getElementById("statusSelect")?.addEventListener("change", updateDateRestriction);
+            statusSelect?.addEventListener("change", updateDateRestriction);
+
+            const allInputs = form.querySelectorAll("input, select");
+
+            allInputs.forEach(el => {
+                el.addEventListener("invalid", function () {
+                    setBulgarianValidationMessage(this);
+                });
+
+                el.addEventListener("input", function () {
+                    this.setCustomValidity("");
+                });
+
+                el.addEventListener("change", function () {
+                    this.setCustomValidity("");
+                });
+            });
+
+            form.addEventListener("submit", function () {
+                allInputs.forEach(el => el.setCustomValidity(""));
+            });
         });
     </script>
 }
