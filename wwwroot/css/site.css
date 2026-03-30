@@ -837,3 +837,17 @@ a {
         padding: 1.4rem;
     }
 }
+
+/* Delete page */
+.danger-hero {
+    border: 1px solid rgba(220, 53, 69, 0.25);
+}
+
+.delete-warning-box {
+    background-color: #fff4f4;
+    border: 1px solid #f5c2c7;
+    color: #842029;
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.2rem;
+    font-weight: 600;
+}

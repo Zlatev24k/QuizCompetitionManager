@@ -1,37 +1,77 @@
 ﻿@model QuizCompetitionManager.Models.Competition
+@using QuizCompetitionManager.Models
 
 @{
     ViewData["Title"] = "Изтриване";
+
+    var statusText = Model.Status == CompetitionStatus.Planned ? "Предстоящо"
+        : Model.Status == CompetitionStatus.Active ? "Активно"
+        : Model.Status == CompetitionStatus.Finished ? "Приключило"
+        : Model.Status.ToString();
 }
 
-<h2 class="mb-3 text-danger">Изтриване на състезание</h2>
+<section class="page-hero-small mb-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-xl-6">
+            <div class="page-hero-small-card danger-hero">
+                <h1 class="page-title mb-2 text-danger">Изтриване на състезание</h1>
+                <p class="page-subtitle mb-0">
+                    Това действие е необратимо. Увери се, че наистина искаш да изтриеш състезанието.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
 
-<div class="alert alert-warning">
-    Сигурен ли си, че искаш да изтриеш това състезание?
-</div>
+<div class="row justify-content-center">
+    <div class="col-lg-7 col-xl-6">
 
-<div class="card">
-    <div class="card-body">
-        <dl class="row mb-0">
-            <dt class="col-sm-3">Име</dt>
-            <dd class="col-sm-9">@Model.Name</dd>
+        <div class="delete-warning-box mb-4">
+            ⚠️ Сигурен ли си, че искаш да изтриеш това състезание?
+        </div>
 
-            <dt class="col-sm-3">Дата/час</dt>
-            <dd class="col-sm-9">@Model.StartDateTime.ToString("dd.MM.yyyy HH:mm")</dd>
+        <div class="competition-details-card mb-4">
+            <div class="competition-details-body">
 
-            <dt class="col-sm-3">Кръгове</dt>
-            <dd class="col-sm-9">@Model.RoundsCount</dd>
+                <div class="mb-3">
+                    <h3 class="manage-summary-title mb-1">@Model.Name</h3>
+                </div>
 
-            <dt class="col-sm-3">Статус</dt>
-            <dd class="col-sm-9">@Model.Status</dd>
-        </dl>
+                <div class="competition-inline-info">
+                    <div class="inline-item">
+                        <span class="inline-label">Дата и час:</span>
+                        <span class="inline-value">@Model.StartDateTime.ToString("dd.MM.yyyy HH:mm")</span>
+                    </div>
+
+                    <div class="inline-item">
+                        <span class="inline-label">Брой кръгове:</span>
+                        <span class="inline-value">@Model.RoundsCount</span>
+                    </div>
+
+                    <div class="inline-item">
+                        <span class="inline-label">Статус:</span>
+                        <span class="status-badge status-@Model.Status.ToString().ToLower()">
+                            @statusText
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <form asp-action="Delete" method="post">
+            <input type="hidden" asp-for="Id" />
+
+            <div class="d-flex flex-wrap gap-2">
+                <button type="submit" class="btn btn-danger form-action-btn">
+                    Да, изтрий
+                </button>
+
+                <a asp-action="Index" class="btn btn-outline-primary form-action-btn">
+                    Отказ
+                </a>
+            </div>
+        </form>
+
     </div>
 </div>
-
-<form asp-action="Delete" method="post" class="mt-3">
-    <input type="hidden" asp-for="Id" />
-    <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-danger">Да, изтрий</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Отказ</a>
-    </div>
-</form>
