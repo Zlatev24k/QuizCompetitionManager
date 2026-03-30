@@ -1,0 +1,76 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Вход";
+}
+
+<section class="page-hero-small mb-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="page-hero-small-card text-center">
+                <h1 class="page-title mb-2">Вход</h1>
+                <p class="page-subtitle mb-0">
+                    Влез в профила си, за да управляваш отбора и участията си.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="form-page-card auth-card">
+            <form id="account" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger validation-summary-custom mb-3" role="alert"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.Email" class="form-label custom-label">Имейл</label>
+                    <input asp-for="Input.Email"
+                           class="form-control custom-input"
+                           autocomplete="username"
+                           aria-required="true"
+                           placeholder="example@email.com" />
+                    <span asp-validation-for="Input.Email" class="text-danger field-validation-custom"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.Password" class="form-label custom-label">Парола</label>
+                    <input asp-for="Input.Password"
+                           class="form-control custom-input"
+                           autocomplete="current-password"
+                           aria-required="true"
+                           placeholder="Въведи парола" />
+                    <span asp-validation-for="Input.Password" class="text-danger field-validation-custom"></span>
+                </div>
+
+                <div class="form-check mb-4">
+                    <input class="form-check-input" asp-for="Input.RememberMe" />
+                    <label asp-for="Input.RememberMe" class="form-check-label remember-label">
+                        Запомни ме
+                    </label>
+                </div>
+
+                <button id="login-submit" type="submit" class="w-100 btn btn-primary form-action-btn auth-submit-btn">
+                    Вход
+                </button>
+
+                <div class="auth-links mt-4">
+                    <p class="mb-2">
+                        <a id="forgot-password" asp-page="./ForgotPassword">Забравена парола?</a>
+                    </p>
+                    <p class="mb-2">
+                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Създай нов акаунт</a>
+                    </p>
+                    <p class="mb-0">
+                        <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Изпрати отново потвърждение за имейл</a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
