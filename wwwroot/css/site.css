@@ -943,3 +943,142 @@ a {
     flex-direction: column;
     align-items: stretch;
 }
+
+
+/* My Results page */
+.results-team-bar {
+    background: var(--white);
+    border: 1px solid rgba(219, 233, 246, 0.9);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    padding: 1rem 1.25rem;
+}
+
+.custom-results-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.results-accordion-item {
+    border: 1px solid rgba(219, 233, 246, 0.9) !important;
+    border-radius: var(--radius-lg) !important;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    background: var(--white);
+}
+
+    .results-accordion-item .accordion-header {
+        margin: 0;
+    }
+
+.results-accordion-button {
+    background: linear-gradient(180deg, #fafdff 0%, #f2f8ff 100%);
+    padding: 1.2rem 1.25rem;
+    box-shadow: none !important;
+}
+
+    .results-accordion-button:not(.collapsed) {
+        background: linear-gradient(180deg, #fafdff 0%, #eef7ff 100%);
+        color: inherit;
+    }
+
+    .results-accordion-button::after {
+        margin-left: 1rem;
+    }
+
+.results-accordion-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding-right: 1rem;
+}
+
+.results-competition-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.results-competition-title-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+}
+
+.results-competition-title {
+    font-size: 1.08rem;
+    color: var(--text-main);
+}
+
+.results-competition-meta {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.results-summary-badges {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.6rem;
+}
+
+.results-total-badge,
+.results-position-badge {
+    display: inline-block;
+    border-radius: 999px;
+    padding: 0.45rem 0.85rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.results-total-badge {
+    background-color: var(--primary-soft);
+    color: var(--primary-dark);
+}
+
+.results-position-badge {
+    background-color: #eef4ff;
+    color: #3b6edc;
+}
+
+.results-accordion-body {
+    padding: 1.25rem;
+    background-color: var(--white);
+}
+
+.results-table-card {
+    background: #fbfdff;
+    border: 1px solid #edf4fb;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+    .results-table-card tfoot th {
+        background-color: #f7fbff;
+        border-top: 1px solid var(--border-soft);
+        font-weight: 700;
+    }
+
+@media (max-width: 767.98px) {
+    .results-accordion-header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-right: 0;
+    }
+
+    .results-summary-badges {
+        justify-content: flex-start;
+    }
+
+    .results-accordion-button {
+        padding: 1rem;
+    }
+
+    .results-accordion-body {
+        padding: 1rem;
+    }
+}

@@ -5,97 +5,135 @@
     ViewData["Title"] = "Моите резултати";
 }
 
-<h2 class="mb-2">Моите резултати</h2>
-<div class="text-muted mb-3">Отбор: <strong>@Model.TeamName</strong></div>
+<section class="page-hero-small mb-4">
+    <div class="page-hero-small-card">
+        <h1 class="page-title mb-2">Моите резултати</h1>
+        <p class="page-subtitle mb-0">
+            Проследявай представянето на своя отбор във всички състезания.
+        </p>
+    </div>
+</section>
+
+<div class="results-team-bar mb-4">
+    <span class="inline-label">Отбор:</span>
+    <span class="inline-value">@Model.TeamName</span>
+</div>
 
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger">@TempData["Error"]</div>
+    <div class="alert alert-danger custom-alert" role="alert">
+        @TempData["Error"]
+    </div>
 }
 
 @if (!Model.Competitions.Any())
 {
-    <div class="alert alert-info">
-        Отборът ти все още не е записан за състезания.
+    <div class="empty-admin-state">
+        <h4 class="mb-2">Все още няма резултати</h4>
+        <p class="mb-0">Отборът ти все още не е записан за състезания.</p>
     </div>
 }
 else
 {
-    <div class="accordion" id="resultsAccordion">
+    <div class="accordion custom-results-accordion" id="resultsAccordion">
         @for (int i = 0; i < Model.Competitions.Count; i++)
         {
             var c = Model.Competitions[i];
             var headingId = $"heading{i}";
             var collapseId = $"collapse{i}";
-            var totalBadgeClass = c.Status == CompetitionStatus.Planned ? "bg-secondary" : "bg-dark";
 
-            <div class="accordion-item">
+            var statusText = c.Status == CompetitionStatus.Planned ? "Предстоящо"
+                : c.Status == CompetitionStatus.Active ? "Активно"
+                : c.Status == CompetitionStatus.Finished ? "Приключило"
+                : c.Status.ToString();
+
+            <div class="accordion-item results-accordion-item">
                 <h2 class="accordion-header" id="@headingId">
-                    <button class="accordion-button @(i == 0 ? "" : "collapsed")" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#@collapseId"
-                            aria-expanded="@(i == 0 ? "true" : "false")" aria-controls="@collapseId">
+                    <button class="accordion-button results-accordion-button @(i == 0 ? "" : "collapsed")"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#@collapseId"
+                            aria-expanded="@(i == 0 ? "true" : "false")"
+                            aria-controls="@collapseId">
 
-                        <div class="w-100 d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>@c.CompetitionName</strong>
-                                <span class="text-muted">• @c.StartDateTime.ToString("dd.MM.yyyy HH:mm")</span>
-                                <span class="ms-2 badge bg-secondary">@c.Status</span>
+                        <div class="results-accordion-header-content w-100">
+                            <div class="results-competition-main">
+                                <div class="results-competition-title-row">
+                                    <strong class="results-competition-title">@c.CompetitionName</strong>
+                                    <span class="status-badge status-@c.Status.ToString().ToLower()">
+                                        @statusText
+                                    </span>
+                                </div>
+
+                                <div class="results-competition-meta">
+                                    @c.StartDateTime.ToString("dd.MM.yyyy HH:mm")
+                                </div>
                             </div>
 
-                            <div class="ms-3">
-                                <span class="badge @totalBadgeClass">Общо: @c.TotalPoints</span>
+                            <div class="results-summary-badges">
+                                <span class="results-total-badge">
+                                    Общо: @c.TotalPoints
+                                </span>
+
                                 @if (c.Position.HasValue)
                                 {
-                                    <span class="badge bg-primary ms-2">Позиция: @c.Position / @c.TeamsCount</span>
+                                    <span class="results-position-badge">
+                                        Позиция: @c.Position / @c.TeamsCount
+                                    </span>
                                 }
                             </div>
                         </div>
                     </button>
                 </h2>
 
-                <div id="@collapseId" class="accordion-collapse collapse @(i == 0 ? "show" : "")"
-                     aria-labelledby="@headingId" data-bs-parent="#resultsAccordion">
-                    <div class="accordion-body">
+                <div id="@collapseId"
+                     class="accordion-collapse collapse @(i == 0 ? "show" : "")"
+                     aria-labelledby="@headingId"
+                     data-bs-parent="#resultsAccordion">
+                    <div class="accordion-body results-accordion-body">
 
                         @if (c.Status == CompetitionStatus.Planned)
                         {
-                            <div class="alert alert-info mb-0">
+                            <div class="alert alert-info custom-alert mb-0">
                                 Все още няма резултати за това състезание.
                             </div>
                         }
                         else
                         {
-                            <div class="table-responsive">
-                                <table class="table table-sm table-striped align-middle">
-                                    <thead>
-                                        <tr>
-                                            <th>Кръг</th>
-                                            <th class="text-end">Точки</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var r in c.Rounds)
-                                        {
+                            <div class="results-table-card">
+                                <div class="table-responsive">
+                                    <table class="table custom-competition-table align-middle mb-0">
+                                        <thead>
                                             <tr>
-                                                <td>Кръг @r.RoundNumber</td>
-                                                <td class="text-end">@r.Points</td>
+                                                <th>Кръг</th>
+                                                <th class="text-end">Точки</th>
                                             </tr>
-                                        }
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th>Общо</th>
-                                            <th class="text-end">@c.TotalPoints</th>
-                                        </tr>
-                                    </tfoot>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var r in c.Rounds)
+                                            {
+                                                <tr>
+                                                    <td>Кръг @r.RoundNumber</td>
+                                                    <td class="text-end fw-semibold">@r.Points</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Общо</th>
+                                                <th class="text-end">@c.TotalPoints</th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
                             </div>
 
-                            <div class="mt-2">
-                                <a class="btn btn-sm btn-outline-secondary"
-                                   asp-controller="Home"
-                                   asp-action="CompetitionDetails"
-                                   asp-route-id="@c.CompetitionId">
+                            <div class="mt-3">
+                                <a class="btn btn-outline-primary action-btn"
+                                       asp-controller="Home"
+                                       asp-action="CompetitionDetails"
+                                       asp-route-id="@c.CompetitionId"
+                                       asp-route-returnUrl="@Context.Request.Path">
                                     Виж детайли и класиране
                                 </a>
                             </div>
