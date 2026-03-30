@@ -1082,3 +1082,27 @@ a {
         padding: 1rem;
     }
 }
+
+/* Auth pages */
+.auth-card {
+    padding-top: 2.1rem;
+    padding-bottom: 2.1rem;
+}
+
+.auth-submit-btn {
+    min-height: 50px;
+}
+
+.auth-links {
+    text-align: center;
+}
+
+    .auth-links a {
+        color: var(--primary-dark);
+        font-weight: 500;
+    }
+
+.remember-label {
+    color: var(--text-main);
+    font-weight: 500;
+}
