@@ -4,69 +4,101 @@
     ViewData["Title"] = "Моят отбор";
 }
 
-<h2 class="mb-3">Моят отбор</h2>
+<section class="page-hero-small mb-4 text-center">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="page-hero-small-card">
+                <h1 class="page-title mb-2">Моят отбор</h1>
+                <p class="page-subtitle mb-0">
+                    Управлявай името на отбора и списъка с неговите членове.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
 
 @if (TempData["Success"] != null)
 {
-    <div class="alert alert-success">@TempData["Success"]</div>
+    <div class="alert alert-success custom-alert text-center">
+        @TempData["Success"]
+    </div>
 }
 
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger">@TempData["Error"]</div>
+    <div class="alert alert-danger custom-alert text-center">
+        @TempData["Error"]
+    </div>
 }
 
-<div class="card mb-3">
-    <div class="card-body d-flex justify-content-between align-items-start">
-        <div>
-            <h5 class="card-title mb-0">@Model.Name</h5>
-            <div class="text-muted">Членове: @Model.Members.Count</div>
-        </div>
+<div class="row justify-content-center">
+    <div class="col-lg-6">
 
-        <a asp-action="EditName" class="btn btn-sm btn-outline-primary">
-            Редактирай име
-        </a>
-    </div>
-</div>
-
-<div class="row g-3">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">Добави член</div>
-            <div class="card-body">
-                <form asp-action="AddMember" method="post" class="d-flex gap-2">
-                    <input name="fullName" class="form-control" placeholder="Име и фамилия" maxlength="80" />
-                    <button class="btn btn-primary" type="submit">Добави</button>
-                </form>
+        <!-- Team info -->
+        <div class="team-overview-card text-center mb-4">
+            <h3 class="manage-summary-title mb-1">@Model.Name</h3>
+            <div class="team-meta-text mb-3">
+                Брой членове: <span class="inline-value">@Model.Members.Count</span>
             </div>
-        </div>
-    </div>
 
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">Списък с членове</div>
-            <div class="card-body">
+            <a asp-action="EditName" class="btn btn-outline-primary action-btn">
+                Редактирай име
+            </a>
+        </div>
+
+        <!-- Members list -->
+        <div class="team-card mb-4">
+            <div class="team-card-header text-center">
+                <h3 class="team-card-title mb-0">Списък с членове</h3>
+            </div>
+
+            <div class="team-card-body">
                 @if (!Model.Members.Any())
                 {
-                    <div class="text-muted">Няма добавени членове.</div>
+                    <div class="empty-state-box text-center">
+                        Няма добавени членове.
+                    </div>
                 }
                 else
                 {
-                    <ul class="list-group">
+                    <div class="member-list">
                         @foreach (var m in Model.Members.OrderBy(x => x.FullName))
                         {
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>@m.FullName</span>
+                            <div class="member-list-item">
+                                <span class="member-name">@m.FullName</span>
 
                                 <form asp-action="RemoveMember" method="post" class="mb-0">
                                     <input type="hidden" name="id" value="@m.Id" />
-                                    <button class="btn btn-sm btn-outline-danger" type="submit">Премахни</button>
+                                    <button class="btn btn-sm btn-outline-danger action-btn" type="submit">
+                                        Премахни
+                                    </button>
                                 </form>
-                            </li>
+                            </div>
                         }
-                    </ul>
+                    </div>
                 }
             </div>
         </div>
+
+        <!-- Add member -->
+        <div class="team-card">
+            <div class="team-card-header text-center">
+                <h3 class="team-card-title mb-0">Добави член</h3>
+            </div>
+
+            <div class="team-card-body">
+                <form asp-action="AddMember" method="post" class="team-member-form vertical-form">
+                    <input name="fullName"
+                           class="form-control custom-input"
+                           placeholder="Име и фамилия"
+                           maxlength="80" />
+
+                    <button class="btn btn-primary form-action-btn w-100" type="submit">
+                        Добави
+                    </button>
+                </form>
+            </div>
+        </div>
+
     </div>
 </div>

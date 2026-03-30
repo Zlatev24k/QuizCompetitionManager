@@ -851,3 +851,95 @@ a {
     padding: 1rem 1.2rem;
     font-weight: 600;
 }
+
+
+/* Team pages */
+.team-overview-card,
+.team-card {
+    background: var(--white);
+    border: 1px solid rgba(219, 233, 246, 0.9);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+}
+
+.team-overview-card {
+    padding: 1.5rem 1.6rem;
+}
+
+.team-meta-text {
+    color: var(--text-muted);
+    font-size: 0.98rem;
+}
+
+.team-card {
+    overflow: hidden;
+}
+
+.team-card-header {
+    padding: 1.2rem 1.4rem;
+    border-bottom: 1px solid var(--border-soft);
+    background: linear-gradient(180deg, #fafdff 0%, #f2f8ff 100%);
+}
+
+.team-card-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.team-card-body {
+    padding: 1.4rem;
+}
+
+.team-member-form {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.member-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.member-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.95rem 1rem;
+    border: 1px solid #edf4fb;
+    border-radius: 14px;
+    background-color: #fbfdff;
+}
+
+.member-name {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+@media (max-width: 767.98px) {
+    .team-overview-card,
+    .team-card-body,
+    .team-card-header {
+        padding-left: 1.2rem;
+        padding-right: 1.2rem;
+    }
+
+    .team-member-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .member-list-item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+/* vertical layout for team page */
+.vertical-form {
+    flex-direction: column;
+    align-items: stretch;
+}
