@@ -2,25 +2,82 @@
     ViewData["Title"] = "Създай отбор";
 }
 
-<h2 class="mb-3">Създай отбор</h2>
-
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Create" method="post">
-            <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
-            <div asp-validation-summary="All" class="text-danger"></div>
-
-            <div class="mb-3">
-                <label class="form-label">Име на отбора</label>
-                <input name="name" class="form-control" maxlength="80" />
+<section class="page-hero-small mb-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="page-hero-small-card text-center">
+                <h1 class="page-title mb-2">Създай отбор</h1>
+                <p class="page-subtitle mb-0">
+                    Въведи име на отбора, за да започнеш участие в състезания.
+                </p>
             </div>
+        </div>
+    </div>
+</section>
 
-            <button type="submit" class="btn btn-primary">Създай</button>
-            <a asp-controller="Home" asp-action="Competitions" class="btn btn-outline-secondary ms-2">Назад</a>
-        </form>
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="form-page-card">
+
+            <form asp-action="Create" method="post" id="createTeamForm" novalidate>
+                <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+
+                <div asp-validation-summary="All" class="text-danger validation-summary-custom mb-3"></div>
+
+                <div class="mb-4">
+                    <label class="form-label custom-label">Име на отбора</label>
+                    <input name="name"
+                           id="teamName"
+                           class="form-control custom-input"
+                           maxlength="80"
+                           required />
+                </div>
+
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-primary form-action-btn">
+                        Създай
+                    </button>
+
+                    <a asp-controller="Home" asp-action="Competitions"
+                           class="btn btn-outline-primary form-action-btn">
+                        Назад
+                    </a>
+                </div>
+            </form>
+
+        </div>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function setBulgarianValidationMessage(el) {
+            if (el.validity.valueMissing) {
+                el.setCustomValidity("Моля, въведете име на отбора.");
+            } else if (el.validity.tooLong) {
+                el.setCustomValidity("Името е твърде дълго.");
+            } else {
+                el.setCustomValidity("");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("createTeamForm");
+            const input = document.getElementById("teamName");
+
+            input.addEventListener("invalid", function () {
+                setBulgarianValidationMessage(this);
+            });
+
+            input.addEventListener("input", function () {
+                this.setCustomValidity("");
+            });
+
+            form.addEventListener("submit", function () {
+                input.setCustomValidity("");
+            });
+        });
+    </script>
 }
