@@ -1,0 +1,35 @@
+﻿@{
+    if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout != null)
+    {
+        Layout = parentLayout.ToString();
+    }
+    else
+    {
+        Layout = "/Areas/Identity/Pages/_Layout.cshtml";
+    }
+}
+
+<section class="page-hero-small mb-4">
+    <div class="page-hero-small-card text-center">
+        <h1 class="page-title mb-2">Управление на акаунта</h1>
+        <p class="page-subtitle mb-0">
+            Промяна на настройките на профила
+        </p>
+    </div>
+</section>
+
+<div class="row g-4">
+    <div class="col-lg-3">
+        <div class="manage-sidebar-card">
+            <partial name="_ManageNav" />
+        </div>
+    </div>
+
+    <div class="col-lg-9">
+        @RenderBody()
+    </div>
+</div>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

@@ -1123,3 +1123,12 @@ a {
     .manage-nav .nav-link:hover {
         background-color: #f2f8ff;
     }
+
+/* Identity Manage layout */
+.manage-sidebar-card {
+    background: var(--white);
+    border: 1px solid rgba(219, 233, 246, 0.9);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    padding: 1rem;
+}
