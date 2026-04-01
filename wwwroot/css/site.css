@@ -1106,3 +1106,20 @@ a {
     color: var(--text-main);
     font-weight: 500;
 }
+
+/* Manage navigation */
+.manage-nav .nav-link {
+    border-radius: 12px;
+    font-weight: 500;
+    color: var(--text-main);
+    padding: 0.55rem 0.9rem;
+}
+
+    .manage-nav .nav-link.active {
+        background-color: var(--primary-soft);
+        color: var(--primary-dark);
+    }
+
+    .manage-nav .nav-link:hover {
+        background-color: #f2f8ff;
+    }
