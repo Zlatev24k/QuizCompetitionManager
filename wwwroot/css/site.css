@@ -1132,3 +1132,65 @@ a {
     box-shadow: var(--shadow-soft);
     padding: 1rem;
 }
+
+/* Manage table team cell alignment */
+.team-cell-layout {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-width: 0;
+}
+
+.team-info-block {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.team-remove-wrap {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.team-members {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin-top: 0.35rem;
+    line-height: 1.5;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.remove-team-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+@media (max-width: 991.98px) {
+    .team-cell-layout {
+        align-items: flex-start;
+    }
+
+    .team-remove-wrap {
+        padding-top: 0.2rem;
+    }
+}
+
+.remove-team-btn i {
+    pointer-events: none;
+}
+
+.remove-team-btn:hover {
+    background-color: #dc3545;
+    color: white;
+}

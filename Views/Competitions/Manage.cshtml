@@ -165,8 +165,8 @@ else
 
                             <tr>
                                 <td class="team-cell">
-                                    <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
-                                        <div>
+                                    <div class="team-cell-layout">
+                                        <div class="team-info-block">
                                             <div class="team-name">@row.TeamName</div>
 
                                             @if (row.Members != null && row.Members.Any())
@@ -188,15 +188,19 @@ else
 
                                         @if (Model.Status != CompetitionStatus.Finished)
                                         {
-                                            <button type="submit"
-                                                    formaction="@Url.Action("RemoveTeam", "Competitions")"
-                                                    formmethod="post"
-                                                    name="registrationId"
-                                                    value="@row.RegistrationId"
-                                                    class="btn btn-sm btn-outline-danger action-btn"
-                                                    onclick="return confirm('Сигурен ли си?');">
-                                                Премахни
-                                            </button>
+                                            <div class="team-remove-wrap">
+                                                <button type="submit"
+                                                        formaction="@Url.Action("RemoveTeam", "Competitions")"
+                                                        formmethod="post"
+                                                        name="registrationId"
+                                                        value="@row.RegistrationId"
+                                                        class="btn btn-sm btn-outline-danger remove-team-btn"
+                                                        onclick="return confirm('Сигурен ли си?');"
+                                                        title="Премахни отбора"
+                                                        aria-label="Премахни отбора">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </div>
                                         }
                                     </div>
                                 </td>
