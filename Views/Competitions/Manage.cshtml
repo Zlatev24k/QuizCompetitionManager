@@ -189,13 +189,12 @@ else
                                         @if (Model.Status != CompetitionStatus.Finished)
                                         {
                                             <div class="team-remove-wrap">
-                                                <button type="submit"
-                                                        formaction="@Url.Action("RemoveTeam", "Competitions")"
-                                                        formmethod="post"
-                                                        name="registrationId"
-                                                        value="@row.RegistrationId"
+                                                <button type="button"
                                                         class="btn btn-sm btn-outline-danger remove-team-btn"
-                                                        onclick="return confirm('Сигурен ли си?');"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#removeTeamModal"
+                                                        data-registration-id="@row.RegistrationId"
+                                                        data-team-name="@row.TeamName"
                                                         title="Премахни отбора"
                                                         aria-label="Премахни отбора">
                                                     <i class="fa-solid fa-trash"></i>
@@ -238,6 +237,43 @@ else
             </div>
         }
     </form>
+
+    <form id="removeTeamForm" action="@Url.Action("RemoveTeam", "Competitions")" method="post" class="d-none">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="competitionId" value="@Model.CompetitionId" />
+        <input type="hidden" id="removeRegistrationId" name="registrationId" />
+    </form>
+
+    <div class="modal fade" id="removeTeamModal" tabindex="-1" aria-labelledby="removeTeamModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-confirm-modal">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title" id="removeTeamModalLabel">Премахване на отбор</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Затвори"></button>
+                </div>
+
+                <div class="modal-body pt-2">
+                    <p class="mb-2">
+                        Сигурен ли си, че искаш да премахнеш отбора
+                        <strong id="removeTeamName"></strong>?
+                    </p>
+                    <p class="text-muted mb-0">
+                        Това действие ще премахне отбора от текущото състезание.
+                    </p>
+                </div>
+
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-primary form-action-btn" data-bs-dismiss="modal">
+                        Отказ
+                    </button>
+
+                    <button type="button" id="confirmRemoveTeamBtn" class="btn btn-danger form-action-btn">
+                        Премахни
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 @section Scripts {
@@ -264,6 +300,38 @@ else
             document.querySelectorAll('.score-input').forEach(i => {
                 i.classList.toggle('is-invalid', !i.checkValidity());
             });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const removeTeamModal = document.getElementById('removeTeamModal');
+            const confirmRemoveTeamBtn = document.getElementById('confirmRemoveTeamBtn');
+            const removeTeamName = document.getElementById('removeTeamName');
+            const removeRegistrationId = document.getElementById('removeRegistrationId');
+            const removeTeamForm = document.getElementById('removeTeamForm');
+
+            if (removeTeamModal) {
+                removeTeamModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const registrationId = button.getAttribute('data-registration-id');
+                    const teamName = button.getAttribute('data-team-name');
+
+                    if (removeRegistrationId) {
+                        removeRegistrationId.value = registrationId;
+                    }
+
+                    if (removeTeamName) {
+                        removeTeamName.textContent = teamName;
+                    }
+                });
+            }
+
+            if (confirmRemoveTeamBtn && removeTeamForm) {
+                confirmRemoveTeamBtn.addEventListener('click', function () {
+                    removeTeamForm.submit();
+                });
+            }
         });
     </script>
 }

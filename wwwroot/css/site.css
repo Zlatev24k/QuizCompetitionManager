@@ -1194,3 +1194,32 @@ a {
     background-color: #dc3545;
     color: white;
 }
+
+/* Confirm modal */
+.custom-confirm-modal {
+    border: 1px solid rgba(219, 233, 246, 0.9);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+}
+
+.custom-confirm-modal .modal-title {
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.custom-confirm-modal .modal-body {
+    color: var(--text-main);
+}
+
+.custom-confirm-modal .text-muted {
+    color: var(--text-muted) !important;
+}
+
+.remove-team-btn i {
+    pointer-events: none;
+}
+
+.remove-team-btn:hover {
+    background-color: #dc3545;
+    color: white;
+}
