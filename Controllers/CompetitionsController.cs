@@ -38,7 +38,7 @@ namespace QuizCompetitionManager.Controllers
             if (model.Status != CompetitionStatus.Finished && model.StartDateTime < DateTime.Now)
             {
                 ModelState.AddModelError(nameof(model.StartDateTime),
-                    "Не може да създадеш състезание със задна дата, освен ако статусът не е 'Finished'.");
+                    "Не може да създадеш състезание със задна дата, освен ако статусът не е 'Приключило'.");
             }
 
             if (!ModelState.IsValid) return View(model);
