@@ -4,11 +4,17 @@
     {
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
+        public string? ErrorCode { get; set; }
 
         public static ServiceResult Ok(string message = "") =>
             new ServiceResult { Success = true, Message = message };
 
-        public static ServiceResult Fail(string message) =>
-            new ServiceResult { Success = false, Message = message };
+        public static ServiceResult Fail(string message, string? errorCode = null) =>
+            new ServiceResult
+            {
+                Success = false,
+                Message = message,
+                ErrorCode = errorCode
+            };
     }
 }
