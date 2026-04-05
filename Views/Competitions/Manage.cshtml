@@ -102,15 +102,14 @@ else
 
                 @if (Model.Status == CompetitionStatus.Active)
                 {
-                    <form asp-action="Finish" method="post" class="mb-0">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@Model.CompetitionId" />
-                        <button class="btn btn-danger action-btn"
-                                type="submit"
-                                onclick="return confirm('Сигурен ли си, че искаш да приключиш състезанието? След това редакцията на точките ще бъде заключена.');">
-                            Приключи
-                        </button>
-                    </form>
+                    <button type="button"
+                            class="btn btn-danger action-btn"
+                            data-bs-toggle="modal"
+                            data-bs-target="#finishCompetitionModal"
+                            data-competition-id="@Model.CompetitionId"
+                            title="Приключи състезанието">
+                        Приключи
+                    </button>
                 }
             </div>
         </div>
@@ -244,6 +243,11 @@ else
         <input type="hidden" id="removeRegistrationId" name="registrationId" />
     </form>
 
+    <form id="finishCompetitionForm" action="@Url.Action("Finish", "Competitions")" method="post" class="d-none">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" id="finishCompetitionId" />
+    </form>
+
     <div class="modal fade" id="removeTeamModal" tabindex="-1" aria-labelledby="removeTeamModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content custom-confirm-modal">
@@ -269,6 +273,36 @@ else
 
                     <button type="button" id="confirmRemoveTeamBtn" class="btn btn-danger form-action-btn">
                         Премахни
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="finishCompetitionModal" tabindex="-1" aria-labelledby="finishCompetitionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-confirm-modal">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title" id="finishCompetitionModalLabel">Приключване на състезание</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Затвори"></button>
+                </div>
+
+                <div class="modal-body pt-2">
+                    <p class="mb-2">
+                        Сигурен ли си, че искаш да приключиш това състезание?
+                    </p>
+                    <p class="text-muted mb-0">
+                        След това редакцията на точките ще бъде заключена и състезанието ще бъде преместено в архива.
+                    </p>
+                </div>
+
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-primary form-action-btn" data-bs-dismiss="modal">
+                        Отказ
+                    </button>
+
+                    <button type="button" id="confirmFinishBtn" class="btn btn-danger form-action-btn">
+                        Приключи
                     </button>
                 </div>
             </div>
@@ -330,6 +364,32 @@ else
             if (confirmRemoveTeamBtn && removeTeamForm) {
                 confirmRemoveTeamBtn.addEventListener('click', function () {
                     removeTeamForm.submit();
+                });
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const finishModal = document.getElementById('finishCompetitionModal');
+            const confirmFinishBtn = document.getElementById('confirmFinishBtn');
+            const finishCompetitionId = document.getElementById('finishCompetitionId');
+            const finishForm = document.getElementById('finishCompetitionForm');
+
+            if (finishModal) {
+                finishModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const compId = button.getAttribute('data-competition-id');
+
+                    if (finishCompetitionId) {
+                        finishCompetitionId.value = compId;
+                    }
+                });
+            }
+
+            if (confirmFinishBtn && finishForm) {
+                confirmFinishBtn.addEventListener('click', function () {
+                    finishForm.submit();
                 });
             }
         });
