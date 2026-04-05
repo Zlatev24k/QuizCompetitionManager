@@ -1233,7 +1233,7 @@ a {
     opacity: 1;
 }
 
-
+/* Navbar */
 .navbar-nav {
     flex-wrap: nowrap;
 }
@@ -1248,4 +1248,50 @@ a {
 
 .nav-link {
     padding: 0.5rem 0.75rem;
+}
+
+/* Competitions Alignment */
+.competition-sections .custom-competition-table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+    .competition-sections .custom-competition-table th:nth-child(1),
+    .competition-sections .custom-competition-table td:nth-child(1) {
+        width: 34%;
+    }
+
+    .competition-sections .custom-competition-table th:nth-child(2),
+    .competition-sections .custom-competition-table td:nth-child(2) {
+        width: 24%;
+    }
+
+    .competition-sections .custom-competition-table th:nth-child(3),
+    .competition-sections .custom-competition-table td:nth-child(3) {
+        width: 12%;
+    }
+
+    .competition-sections .custom-competition-table th:nth-child(4),
+    .competition-sections .custom-competition-table td:nth-child(4) {
+        width: 30%;
+    }
+
+    .competition-sections .custom-competition-table th,
+    .competition-sections .custom-competition-table td {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+        .competition-sections .custom-competition-table td:last-child,
+        .competition-sections .custom-competition-table th:last-child {
+            text-align: right;
+        }
+
+.admin-table-card td:first-child,
+.admin-table-card th:first-child {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
