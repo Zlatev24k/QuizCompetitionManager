@@ -27,32 +27,46 @@
                 <div class="collapse navbar-collapse" id="mainNavbar">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Начало</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">
+                                <i class="fa-solid fa-house me-1"></i> Начало
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Competitions">Състезания</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Competitions">
+                                <i class="fa-solid fa-trophy me-1"></i> Състезания
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Rules">Правила</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Rules">
+                                <i class="fa-solid fa-scroll me-1"></i> Правила
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Поверителност</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Privacy">
+                                <i class="fa-solid fa-shield-halved me-1"></i> Поверителност
+                            </a>
                         </li>
 
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Competitions" asp-action="Index">Управление на състезания</a>
+                                <a class="nav-link" asp-controller="Competitions" asp-action="Index">
+                                    <i class="fa-solid fa-gear me-1"></i> Управление на състезания
+                                </a>
                             </li>
                         }
 
                         @if (User.Identity?.IsAuthenticated == true && !User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Team" asp-action="Index">Моят отбор</a>
+                                <a class="nav-link" asp-controller="Team" asp-action="Index">
+                                    <i class="fa-solid fa-users me-1"></i> Моят отбор
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Results" asp-action="My">Моите резултати</a>
+                                <a class="nav-link" asp-controller="Results" asp-action="My">
+                                    <i class="fa-solid fa-chart-column me-1"></i> Моите резултати
+                                </a>
                             </li>
                         }
                     </ul>

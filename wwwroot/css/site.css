@@ -1223,3 +1223,12 @@ a {
     background-color: #dc3545;
     color: white;
 }
+
+.nav-link i {
+    font-size: 0.9rem;
+    opacity: 0.85;
+}
+
+.nav-link:hover i {
+    opacity: 1;
+}
