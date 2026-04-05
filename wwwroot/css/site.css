@@ -1232,3 +1232,20 @@ a {
 .nav-link:hover i {
     opacity: 1;
 }
+
+
+.navbar-nav {
+    flex-wrap: nowrap;
+}
+
+.nav-link {
+    white-space: nowrap;
+}
+
+.navbar-nav {
+    overflow-x: auto;
+}
+
+.nav-link {
+    padding: 0.5rem 0.75rem;
+}
