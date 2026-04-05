@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using QuizCompetitionManager.Data;
+using QuizCompetitionManager.Services;
+using QuizCompetitionManager.Services.Interfaces;
 
 namespace QuizCompetitionManager
 {
@@ -25,6 +27,8 @@ namespace QuizCompetitionManager
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddScoped<IHomeService, HomeService>();
 
             var app = builder.Build();
 

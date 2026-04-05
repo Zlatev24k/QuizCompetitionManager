@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using QuizCompetitionManager.Data;
+using QuizCompetitionManager.Helpers;
 using QuizCompetitionManager.Models;
 using QuizCompetitionManager.Models.ViewModels;
-using QuizCompetitionManager.Helpers;
+using QuizCompetitionManager.Services.Interfaces;
 using System.Diagnostics;
 
 namespace QuizCompetitionManager.Controllers
@@ -12,14 +12,17 @@ namespace QuizCompetitionManager.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly ApplicationDbContext _db;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IHomeService _homeService;
 
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext db, UserManager<IdentityUser> userManager)
+        public HomeController(
+            ILogger<HomeController> logger,
+            UserManager<IdentityUser> userManager,
+            IHomeService homeService)
         {
             _logger = logger;
-            _db = db;
             _userManager = userManager;
+            _homeService = homeService;
         }
 
         public IActionResult Index()
@@ -31,34 +34,21 @@ namespace QuizCompetitionManager.Controllers
         {
             return View();
         }
+
         public async Task<IActionResult> Competitions()
         {
-            var comps = await _db.Competitions
-                .OrderBy(c => c.Status)
-                .ThenByDescending(c => c.StartDateTime)
-                .ToListAsync();
+            var canJoinOrUnjoin =
+                User.Identity?.IsAuthenticated == true &&
+                !User.IsInRole(SeedData.AdminRole);
 
-            var vm = new PublicCompetitionsVM
+            string? userId = null;
+
+            if (canJoinOrUnjoin)
             {
-                Competitions = comps,
-                CanJoinOrUnjoin = User.Identity?.IsAuthenticated == true && !User.IsInRole(SeedData.AdminRole)
-            };
-
-            if (vm.CanJoinOrUnjoin)
-            {
-                var userId = _userManager.GetUserId(User)!;
-
-                var team = await _db.Teams.FirstOrDefaultAsync(t => t.OwnerUserId == userId);
-                if (team != null)
-                {
-                    var joined = await _db.CompetitionRegistrations
-                        .Where(r => r.TeamId == team.Id)
-                        .Select(r => r.CompetitionId)
-                        .ToListAsync();
-
-                    vm.JoinedCompetitionIds = joined.ToHashSet();
-                }
+                userId = _userManager.GetUserId(User);
             }
+
+            var vm = await _homeService.GetPublicCompetitionsAsync(canJoinOrUnjoin, userId);
 
             return View(vm);
         }
@@ -71,32 +61,11 @@ namespace QuizCompetitionManager.Controllers
         public async Task<IActionResult> CompetitionDetails(int id, string? returnUrl = null)
         {
             ViewBag.ReturnUrl = returnUrl;
-            var comp = await _db.Competitions
-        .FirstOrDefaultAsync(c => c.Id == id);
 
-            if (comp == null) return NotFound();
+            var vm = await _homeService.GetCompetitionDetailsAsync(id);
 
-            var vm = new CompetitionDetailsVM
-            {
-                Competition = comp
-            };
-
-            if (comp.Status != CompetitionStatus.Planned)
-            {
-                var regs = await _db.CompetitionRegistrations
-                    .Where(r => r.CompetitionId == id)
-                    .Include(r => r.Team)
-                    .Include(r => r.RoundScores)
-                    .ToListAsync();
-
-                var ranked = RankingHelper.BuildRanking(regs, comp.RoundsCount);
-
-                vm.Ranking = ranked.Select(r => new RankingRowVM
-                {
-                    TeamName = r.TeamName,
-                    TotalPoints = r.TotalPoints
-                }).ToList();
-            }
+            if (vm == null)
+                return NotFound();
 
             return View(vm);
         }
@@ -104,7 +73,10 @@ namespace QuizCompetitionManager.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            });
         }
     }
 }
