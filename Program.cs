@@ -29,6 +29,7 @@ namespace QuizCompetitionManager
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddScoped<IHomeService, HomeService>();
+            builder.Services.AddScoped<ICompetitionsService, CompetitionsService>();
 
             var app = builder.Build();
 

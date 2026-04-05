@@ -1,35 +1,35 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using QuizCompetitionManager.Data;
 using QuizCompetitionManager.Models;
 using QuizCompetitionManager.Models.ViewModels;
-using QuizCompetitionManager.Helpers;
+using QuizCompetitionManager.Services.Interfaces;
 
 namespace QuizCompetitionManager.Controllers
 {
     [Authorize(Roles = SeedData.AdminRole)]
     public class CompetitionsController : Controller
     {
-        private readonly ApplicationDbContext _db;
+        private readonly ICompetitionsService _competitionsService;
 
-        public CompetitionsController(ApplicationDbContext db)
+        public CompetitionsController(ICompetitionsService competitionsService)
         {
-            _db = db;
+            _competitionsService = competitionsService;
         }
 
         // LIST
         public async Task<IActionResult> Index()
         {
-            var comps = await _db.Competitions
-                .OrderByDescending(c => c.StartDateTime)
-                .ToListAsync();
-
+            var comps = await _competitionsService.GetAllAsync();
             return View(comps);
         }
 
         // CREATE
-        public IActionResult Create() => View(new Competition { StartDateTime = DateTime.Now, RoundsCount = 4 });
+        public async Task<IActionResult> Create()
+        {
+            var model = await _competitionsService.GetCreateModelAsync();
+            return View(model);
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -41,18 +41,19 @@ namespace QuizCompetitionManager.Controllers
                     "Не може да създадеш състезание със задна дата, освен ако статусът не е 'Приключило'.");
             }
 
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+                return View(model);
 
-            _db.Competitions.Add(model);
-            await _db.SaveChangesAsync();
+            await _competitionsService.CreateAsync(model);
             return RedirectToAction(nameof(Index));
         }
 
         // EDIT
         public async Task<IActionResult> Edit(int id)
         {
-            var comp = await _db.Competitions.FindAsync(id);
+            var comp = await _competitionsService.GetByIdAsync(id);
             if (comp == null) return NotFound();
+
             return View(comp);
         }
 
@@ -60,50 +61,27 @@ namespace QuizCompetitionManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Competition model)
         {
-            if (id != model.Id) return BadRequest();
+            if (id != model.Id)
+                return BadRequest();
 
             if (model.Status != CompetitionStatus.Finished && model.StartDateTime < DateTime.Now)
             {
                 ModelState.AddModelError(nameof(model.StartDateTime),
-                    "Не може да зададеш дата в миналото, освен ако статусът не е 'Finished'.");
+                    "Не може да зададеш дата в миналото, освен ако статусът не е 'Приключило'.");
             }
 
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+                return View(model);
 
-            _db.Entry(model).State = EntityState.Modified;
-            await _db.SaveChangesAsync();
+            await _competitionsService.UpdateAsync(model);
             return RedirectToAction(nameof(Index));
         }
 
         // DETAILS
         public async Task<IActionResult> Details(int id)
         {
-            var comp = await _db.Competitions
-                .FirstOrDefaultAsync(c => c.Id == id);
-
-            if (comp == null) return NotFound();
-
-            var vm = new AdminCompetitionDetailsVM
-            {
-                Competition = comp
-            };
-
-            if (comp.Status != CompetitionStatus.Planned)
-            {
-                var regs = await _db.CompetitionRegistrations
-                    .Where(r => r.CompetitionId == id)
-                    .Include(r => r.Team)
-                    .Include(r => r.RoundScores)
-                    .ToListAsync();
-
-                var ranked = RankingHelper.BuildRanking(regs, comp.RoundsCount);
-
-                vm.Ranking = ranked.Select(r => new AdminRankingRowVM
-                {
-                    TeamName = r.TeamName,
-                    TotalPoints = r.TotalPoints
-                }).ToList();
-            }
+            var vm = await _competitionsService.GetDetailsAsync(id);
+            if (vm == null) return NotFound();
 
             return View(vm);
         }
@@ -111,8 +89,9 @@ namespace QuizCompetitionManager.Controllers
         // DELETE
         public async Task<IActionResult> Delete(int id)
         {
-            var comp = await _db.Competitions.FindAsync(id);
+            var comp = await _competitionsService.GetByIdAsync(id);
             if (comp == null) return NotFound();
+
             return View(comp);
         }
 
@@ -120,102 +99,48 @@ namespace QuizCompetitionManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var comp = await _db.Competitions.FindAsync(id);
+            var comp = await _competitionsService.GetByIdAsync(id);
             if (comp == null) return NotFound();
 
-            _db.Competitions.Remove(comp);
-            await _db.SaveChangesAsync();
+            await _competitionsService.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        //START
+        // START
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Start(int id)
         {
-            var comp = await _db.Competitions.FindAsync(id);
+            var comp = await _competitionsService.GetByIdAsync(id);
             if (comp == null) return NotFound();
 
-            if (comp.Status != CompetitionStatus.Planned)
+            var result = await _competitionsService.StartCompetitionAsync(id);
+
+            if (!result.Success)
             {
-                TempData["Error"] = "Само планирано състезание може да бъде стартирано.";
+                TempData["Error"] = result.Message;
                 return RedirectToAction(nameof(Index));
             }
 
-            var hasTeams = await _db.CompetitionRegistrations
-                .AnyAsync(r => r.CompetitionId == id);
-
-            if (!hasTeams)
-            {
-                TempData["Error"] = "Не може да стартираш състезание без записани отбори.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            comp.Status = CompetitionStatus.Active;
-            await _db.SaveChangesAsync();
-
-            TempData["Success"] = "Състезанието е стартирано успешно.";
+            TempData["Success"] = result.Message;
             return RedirectToAction(nameof(Index));
         }
 
-        //MANAGE
+        // MANAGE
         public async Task<IActionResult> Manage(int id)
         {
-            var comp = await _db.Competitions
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.Id == id);
-
-            if (comp == null) return NotFound();
-
-            var regs = await _db.CompetitionRegistrations
-                .Where(r => r.CompetitionId == id)
-                .Include(r => r.Team)
-                    .ThenInclude(t => t.Members)
-                .Include(r => r.RoundScores)
-                .AsNoTracking()
-                .ToListAsync();
-
-            var vm = new CompetitionManageVM
-            {
-                CompetitionId = comp.Id,
-                CompetitionName = comp.Name,
-                StartDateTime = comp.StartDateTime,
-                Status = comp.Status,
-                RoundsCount = comp.RoundsCount,
-                Teams = regs
-                    .OrderBy(r => r.Team!.Name)
-                    .Select(r => new TeamScoreRowVM
-                    {
-                        RegistrationId = r.Id,
-                        TeamName = r.Team!.Name,
-                        Members = r.Team!.Members
-                            .OrderBy(m => m.FullName)
-                            .Select(m => m.FullName)
-                            .ToList(),
-                        RoundPoints = Enumerable.Range(1, comp.RoundsCount)
-                            .Select(round =>
-                            {
-                                var existing = r.RoundScores.FirstOrDefault(s => s.RoundNumber == round);
-                                return new RoundPointVM
-                                {
-                                    RoundNumber = round,
-                                    Points = existing?.Points ?? 0
-                                };
-                            })
-                            .ToList()
-                    })
-                    .ToList()
-            };
+            var vm = await _competitionsService.GetManageDataAsync(id);
+            if (vm == null) return NotFound();
 
             return View(vm);
         }
 
-        //SAVEALL
+        // SAVE ALL
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveAll(CompetitionManageVM vm)
         {
-            var comp = await _db.Competitions.FirstOrDefaultAsync(c => c.Id == vm.CompetitionId);
+            var comp = await _competitionsService.GetByIdAsync(vm.CompetitionId);
             if (comp == null) return NotFound();
 
             if (comp.Status != CompetitionStatus.Active)
@@ -224,100 +149,49 @@ namespace QuizCompetitionManager.Controllers
                 return RedirectToAction(nameof(Manage), new { id = vm.CompetitionId });
             }
 
-            var regIds = vm.Teams.Select(t => t.RegistrationId).ToList();
-
-            var existingScores = await _db.RoundScores
-                .Where(s => regIds.Contains(s.CompetitionRegistrationId))
-                .ToListAsync();
-
-            var scoreMap = existingScores.ToDictionary(
-                s => (s.CompetitionRegistrationId, s.RoundNumber),
-                s => s
-            );
-
-            foreach (var team in vm.Teams)
-            {
-                foreach (var rp in team.RoundPoints)
-                {
-                    if (rp.RoundNumber < 1 || rp.RoundNumber > comp.RoundsCount)
-                        continue;
-
-                    var points = rp.Points;
-
-                    if (points < 0)
-                        points = 0;
-
-                    if (points > 20)
-                        points = 20;
-
-                    var key = (team.RegistrationId, rp.RoundNumber);
-
-                    if (scoreMap.TryGetValue(key, out var score))
-                    {
-                        score.Points = points;
-                    }
-                    else
-                    {
-                        _db.RoundScores.Add(new RoundScore
-                        {
-                            CompetitionRegistrationId = team.RegistrationId,
-                            RoundNumber = rp.RoundNumber,
-                            Points = points
-                        });
-                    }
-                }
-            }
-
-            await _db.SaveChangesAsync();
+            await _competitionsService.SaveAllScoresAsync(vm);
 
             TempData["Success"] = "Точките са записани успешно.";
             return RedirectToAction(nameof(Manage), new { id = vm.CompetitionId });
         }
 
-        //FINISH
+        // FINISH
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Finish(int id)
         {
-            var comp = await _db.Competitions.FindAsync(id);
+            var comp = await _competitionsService.GetByIdAsync(id);
             if (comp == null) return NotFound();
 
-            if (comp.Status != CompetitionStatus.Active)
+            var result = await _competitionsService.FinishCompetitionAsync(id);
+
+            if (!result.Success)
             {
-                TempData["Error"] = "Само активно състезание може да бъде приключено.";
+                TempData["Error"] = result.Message;
                 return RedirectToAction(nameof(Manage), new { id });
             }
 
-            comp.Status = CompetitionStatus.Finished;
-            await _db.SaveChangesAsync();
-
-            TempData["Success"] = "Състезанието е приключено и е преместено в Архив.";
+            TempData["Success"] = result.Message;
             return RedirectToAction(nameof(Manage), new { id });
         }
 
-        //REMOVE TEAM
+        // REMOVE TEAM
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveTeam(int competitionId, int registrationId)
         {
-            var comp = await _db.Competitions.FindAsync(competitionId);
+            var comp = await _competitionsService.GetByIdAsync(competitionId);
             if (comp == null) return NotFound();
 
-            if (comp.Status == CompetitionStatus.Finished)
+            var result = await _competitionsService.RemoveTeamAsync(competitionId, registrationId);
+
+            if (!result.Success)
             {
-                TempData["Error"] = "Не може да премахваш отбори от приключило състезание.";
+                TempData["Error"] = result.Message;
                 return RedirectToAction(nameof(Manage), new { id = competitionId });
             }
 
-            var reg = await _db.CompetitionRegistrations
-                .FirstOrDefaultAsync(r => r.Id == registrationId && r.CompetitionId == competitionId);
-
-            if (reg == null) return NotFound();
-
-            _db.CompetitionRegistrations.Remove(reg);
-            await _db.SaveChangesAsync();
-
-            TempData["Success"] = "Отборът беше премахнат от състезанието.";
+            TempData["Success"] = result.Message;
             return RedirectToAction(nameof(Manage), new { id = competitionId });
         }
     }
