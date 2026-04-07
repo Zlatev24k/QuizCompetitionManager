@@ -1,21 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using QuizCompetitionManager.Data;
-using QuizCompetitionManager.Models;
+using QuizCompetitionManager.Services.Interfaces;
 
 namespace QuizCompetitionManager.Controllers
 {
     [Authorize]
     public class TeamController : Controller
     {
-        private readonly ApplicationDbContext _db;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly ITeamService _teamService;
 
-        public TeamController(ApplicationDbContext db, UserManager<IdentityUser> userManager)
+        public TeamController(ITeamService teamService, UserManager<IdentityUser> userManager)
         {
-            _db = db;
+            _teamService = teamService;
             _userManager = userManager;
         }
 
@@ -23,9 +21,7 @@ namespace QuizCompetitionManager.Controllers
         {
             var userId = _userManager.GetUserId(User)!;
 
-            var team = await _db.Teams
-                .Include(t => t.Members)
-                .FirstOrDefaultAsync(t => t.OwnerUserId == userId);
+            var team = await _teamService.GetUserTeamAsync(userId);
 
             if (team == null)
                 return RedirectToAction(nameof(Create));
@@ -43,44 +39,29 @@ namespace QuizCompetitionManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(string name, string? returnUrl = null)
         {
-            name = (name ?? string.Empty).Trim();
-
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                ModelState.AddModelError("", "Името на отбора е задължително.");
-                return View();
-            }
-
-            if (name.Length > 80)
-            {
-                ModelState.AddModelError("", "Името на отбора е твърде дълго (макс. 80 символа).");
-                return View();
-            }
-
             var userId = _userManager.GetUserId(User)!;
 
-            var existing = await _db.Teams.AnyAsync(t => t.OwnerUserId == userId);
-            if (existing)
-                return RedirectToAction(nameof(Index));
+            var result = await _teamService.CreateTeamAsync(userId, name);
 
-            var nameExists = await _db.Teams.AnyAsync(t => t.Name.ToLower() == name.ToLower());
-            if (nameExists)
+            if (!result.Success)
             {
-                ModelState.AddModelError("", "Вече съществува отбор с това име.");
+                if (result.ErrorCode == "InvalidName" || result.ErrorCode == "DuplicateTeamName")
+                {
+                    ModelState.AddModelError("", result.Message);
+                    ViewBag.ReturnUrl = returnUrl;
+                    return View();
+                }
+
+                if (result.ErrorCode == "TeamAlreadyExistsForUser")
+                    return RedirectToAction(nameof(Index));
+
+                ModelState.AddModelError("", result.Message);
+                ViewBag.ReturnUrl = returnUrl;
                 return View();
             }
 
-            var team = new Team
-            {
-                Name = name,
-                OwnerUserId = userId
-            };
-
-            _db.Teams.Add(team);
-            await _db.SaveChangesAsync();
-
             TempData.Remove("Error");
-            TempData["Success"] = "Отборът беше създаден успешно. Вече можеш да се запишеш за състезание.";
+            TempData["Success"] = result.Message;
 
             if (!string.IsNullOrEmpty(returnUrl))
                 return Redirect(returnUrl);
@@ -92,32 +73,19 @@ namespace QuizCompetitionManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddMember(string fullName)
         {
-            fullName = (fullName ?? string.Empty).Trim();
-
-            if (string.IsNullOrWhiteSpace(fullName))
-            {
-                TempData["Error"] = "Името на члена е задължително.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            if (fullName.Length > 80)
-            {
-                TempData["Error"] = "Името е твърде дълго (макс. 80 символа).";
-                return RedirectToAction(nameof(Index));
-            }
-
             var userId = _userManager.GetUserId(User)!;
 
-            var team = await _db.Teams.FirstOrDefaultAsync(t => t.OwnerUserId == userId);
-            if (team == null) return RedirectToAction(nameof(Create));
+            var result = await _teamService.AddMemberAsync(userId, fullName);
 
-            _db.TeamMembers.Add(new TeamMember
+            if (!result.Success)
             {
-                TeamId = team.Id,
-                FullName = fullName
-            });
+                if (result.ErrorCode == "TeamNotFound")
+                    return RedirectToAction(nameof(Create));
 
-            await _db.SaveChangesAsync();
+                TempData["Error"] = result.Message;
+                return RedirectToAction(nameof(Index));
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -127,17 +95,20 @@ namespace QuizCompetitionManager.Controllers
         {
             var userId = _userManager.GetUserId(User)!;
 
-            var member = await _db.TeamMembers
-                .Include(m => m.Team)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var result = await _teamService.RemoveMemberAsync(userId, id);
 
-            if (member == null) return NotFound();
+            if (!result.Success)
+            {
+                if (result.ErrorCode == "MemberNotFound")
+                    return NotFound();
 
-            if (member.Team == null || member.Team.OwnerUserId != userId)
-                return Forbid();
+                if (result.ErrorCode == "Forbidden")
+                    return Forbid();
 
-            _db.TeamMembers.Remove(member);
-            await _db.SaveChangesAsync();
+                TempData["Error"] = result.Message;
+                return RedirectToAction(nameof(Index));
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -145,49 +116,48 @@ namespace QuizCompetitionManager.Controllers
         {
             var userId = _userManager.GetUserId(User)!;
 
-            var team = await _db.Teams.FirstOrDefaultAsync(t => t.OwnerUserId == userId);
-            if (team == null)
-                return RedirectToAction(nameof(Create));
+            var result = await _teamService.GetTeamForEditAsync(userId);
 
-            return View(team);
+            if (!result.Success)
+            {
+                if (result.ErrorCode == "TeamNotFound")
+                    return RedirectToAction(nameof(Create));
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(result.Data);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditName(int id, string name)
         {
-            name = (name ?? string.Empty).Trim();
-
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                ModelState.AddModelError("", "Името на отбора е задължително.");
-            }
-            else if (name.Length > 80)
-            {
-                ModelState.AddModelError("", "Името на отбора е твърде дълго (макс. 80 символа).");
-            }
-
             var userId = _userManager.GetUserId(User)!;
 
-            var team = await _db.Teams.FirstOrDefaultAsync(t => t.Id == id && t.OwnerUserId == userId);
-            if (team == null)
-                return NotFound();
+            var result = await _teamService.EditTeamNameAsync(userId, id, name);
 
-            if (!ModelState.IsValid)
-                return View(team);
-
-            var nameExists = await _db.Teams.AnyAsync(t => t.Id != id && t.Name.ToLower() == name.ToLower());
-            if (nameExists)
+            if (!result.Success)
             {
-                ModelState.AddModelError("", "Вече съществува отбор с това име.");
-                team.Name = name;
-                return View(team);
+                if (result.ErrorCode == "TeamNotFound")
+                    return NotFound();
+
+                var teamResult = await _teamService.GetTeamForEditAsync(userId);
+                if (!teamResult.Success || teamResult.Data == null)
+                    return RedirectToAction(nameof(Create));
+
+                if (result.ErrorCode == "InvalidName" || result.ErrorCode == "DuplicateTeamName")
+                {
+                    ModelState.AddModelError("", result.Message);
+                    teamResult.Data.Name = name;
+                    return View(teamResult.Data);
+                }
+
+                ModelState.AddModelError("", result.Message);
+                return View(teamResult.Data);
             }
 
-            team.Name = name;
-            await _db.SaveChangesAsync();
-
-            TempData["Success"] = "Името на отбора беше обновено успешно.";
+            TempData["Success"] = result.Message;
             return RedirectToAction(nameof(Index));
         }
     }
