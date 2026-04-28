@@ -64,15 +64,15 @@ namespace QuizCompetitionManager.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
-            [EmailAddress]
+            [Required(ErrorMessage = "Полето за имейл е задължително.")]
+            [EmailAddress(ErrorMessage = "Въведи валиден имейл адрес.")]
             public string Email { get; set; }
 
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
+            [Required(ErrorMessage = "Полето за парола е задължително.")]
             [DataType(DataType.Password)]
             public string Password { get; set; }
 
@@ -128,7 +128,7 @@ namespace QuizCompetitionManager.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, "Невалиден имейл или парола.");
                     return Page();
                 }
             }
